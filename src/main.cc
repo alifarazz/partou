@@ -2,6 +2,7 @@
 #include <limits>
 #include <ranges>
 #include <string>
+#include <memory>
 //
 // #include <fmt/format.h>
 //
@@ -14,14 +15,15 @@
 #include "shapes/hitable_list.hh"
 #include "shapes/sphere.hh"
 
-auto color_ray(const partou::Ray& r, partou::Hitable* world) -> partou::Vec3f
+auto color_ray(const partou::Ray& r, partou::Hitable& world) -> partou::Vec3f
 {
   using namespace partou;
 
   hit_info hinfo;
-  if (world->hit(r, 0.0, std::numeric_limits<Float>::max(), hinfo)) {
+  if (world.hit(r, 0.0, std::numeric_limits<Float>::max(), hinfo)) {
     return (hinfo.normal + Vec3f(1.0f)) / 2.0f;
-  }  // background
+  }
+  // color background: horizontal gradiant
   auto unit_dir = r.dir().normalizedExc();
   auto t = (unit_dir.y + 1.0f) / 2.0f;
   return math::interpolate_linear(Vec3f(.5, .7, 1.), Vec3f(1.0), t);
@@ -38,11 +40,9 @@ auto main() -> int
   Vec3f vertical(0., 2., 0.);
   Vec3f origin(0., 0., 0.);
 
-  auto sphere1 = Sphere(Vec3f(0, 0, -1), 0.8, nullptr);
-  auto sphere2 = Sphere(Vec3f(0, -100.5, -1), 100.0, nullptr);
-  Hitable* list[2] = {&sphere1, &sphere2};
-  auto hitable_list = HitableList(list, 2);
-  Hitable* world = &hitable_list;
+  auto sphere1 = std::make_shared<Sphere>(Vec3f(0, 0, -1), 0.8, nullptr);
+  auto sphere2 = std::make_shared<Sphere>(Vec3f(0, -100.5, -1), 100.0, nullptr);
+  auto world = HitableList{{sphere1, sphere2}};
 
   FilmBuffer<Vec3f> filmbuffer {ny, nx};
 

@@ -18,7 +18,7 @@ struct hit_info
   Material* mat_ptr;  /// fix me pls, I can be both a const and a ref
 };
 
-class Hitable
+ class Hitable
 {
 public:
   virtual bool hit(const Ray& r,
@@ -40,6 +40,9 @@ public:
 
   //   return AABB(small, big);
   // }
+protected:
+    Hitable() = default;
+
 };
 
 }  // namespace partou

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+#include <memory>
+
 #include "hitable.hh"
 
 namespace partou
@@ -8,9 +11,8 @@ class HitableList : public Hitable
 {
 public:
   HitableList() {}
-  HitableList(Hitable** l, int n)
-      : list {l}
-      , count {n}
+  HitableList(std::vector<std::shared_ptr<const Hitable>> hitable_vector)
+      : hitables {hitable_vector}
   {
   }
   bool hit(const Ray& r,
@@ -19,8 +21,10 @@ public:
            hit_info& info) const override;
   // virtual bool bounding_box(Float t0, Float t1, AABB& box) const;
 
-  Hitable** list;
-  int count;
+  auto begin();
+  auto end();
+
+  std::vector<std::shared_ptr<const Hitable>> hitables;
 };
 
 }  // namespace partou

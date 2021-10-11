@@ -7,19 +7,28 @@ bool HitableList::hit(const Ray& r,
                       Float t_max,
                       hit_info& info) const
 {
-  hit_info temp_info;
-  bool hit_anything = false;
+  hit_info temp_hitinfo;
+  bool ray_did_hit_something = false;
   auto closest_so_far = t_max;
 
-  for (int i = 0; i < count; i++) {
-    if (list[i]->hit(r, t_min, closest_so_far, temp_info)) {
-      hit_anything = true;
-      closest_so_far = temp_info.t;
-      info = temp_info;
+  for (const auto& hitable : this->hitables) {
+    if (hitable->hit(r, t_min, closest_so_far, temp_hitinfo)) {
+      ray_did_hit_something = true;
+      closest_so_far = temp_hitinfo.t;
+      info = temp_hitinfo;
     }
   }
 
-  return hit_anything;
+  return ray_did_hit_something;
+}
+
+auto HitableList::begin()
+{
+  return hitables.begin();
+}
+auto HitableList::end()
+{
+  return hitables.end();
 }
 
 // bool HitableList::bounding_box(Float t0, Float t1, AABB& box) const
