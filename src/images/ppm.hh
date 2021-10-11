@@ -13,9 +13,8 @@ class PPMImageSaver
 {
 public:
   FilmBuffer<PixelType>& filmbuffer;
-  std::ostream& out;
 
-  auto save()
+  auto save(std::ostream& out)
   {
     cli::ProgressBar pb {filmbuffer.buf.size() - 1, "PPMImageSaver.save: "};
     out << "P3\n" << filmbuffer.nx() << " " << filmbuffer.ny() << "\n255\n";
