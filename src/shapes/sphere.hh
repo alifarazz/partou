@@ -11,8 +11,8 @@ class Sphere : public Hitable
 {
 public:
   Sphere() {}
-  Sphere(Vec3f cen, Float r, Material* matp)  // fix the material raw ptr
-      : center {cen}
+  Sphere(Vec3f center, Float r, Material* matp)  // fix the material raw ptr
+      : center {center}
       , radius {r}
       , mat_ptr {matp}
   {
