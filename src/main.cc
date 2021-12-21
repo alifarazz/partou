@@ -1,7 +1,6 @@
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <ranges>
 #include <string>
 //
 // #include <fmt/format.h>
@@ -14,18 +13,19 @@
 #include "shapes/hitable.hh"
 #include "shapes/hitable_list.hh"
 #include "shapes/sphere.hh"
+#include "shapes/triangle.hh"
 
-auto color_ray(const partou::Ray& r, partou::Hitable& world) -> partou::Vec3f
+auto color_ray(const partou::Ray& r, const partou::Hitable& world) -> partou::Vec3f
 {
   using namespace partou;
 
   hit_info hinfo;
   if (world.hit(r, 0.0, std::numeric_limits<Float>::max(), hinfo)) {
-    return (hinfo.normal + Vec3f(1.0f)) / 2.0f;
+    return (hinfo.normal + Vec3f(1.0F)) / 2.0F;
   }
   // color background: horizontal gradiant
   auto unit_dir = r.dir().normalized();
-  auto t = (unit_dir.y + 1.0f) / 2.0f;
+  auto t = (unit_dir.y + 1.0F) / 2.0F;
   return math::interpolate_linear(Vec3f(.5, .7, 1.), Vec3f(1.0), t);
 }
 
@@ -74,5 +74,6 @@ auto main() -> int
   // for (auto i : std::ranges::iota_view{2, 8})
   //   filmbuffer.pixel_color(i, 9) = Vec3f{1, 1, 1};
 
-  PPMImageSaver(filmbuffer).save(std::cout);
+  auto saver = PPMImageSaver {filmbuffer};
+  saver.save(std::cout);
 }

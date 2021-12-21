@@ -25,15 +25,15 @@ struct hit_info
     is_front_facing = outward_surface_normal.dot(-r.dir()) > 0;
     normal = is_front_facing ? outward_surface_normal : -outward_surface_normal;
   }
-};
+} __attribute__((aligned(64)));
 
 class Hitable
 {
 public:
-  virtual bool hit(const Ray& r,
+  virtual auto hit(const Ray& r,
                    float t_min,
                    float t_max,
-                   hit_info& info) const = 0;
+                   hit_info& info) const -> bool = 0;
 
   // virtual bool bounding_box(float t0, float t1, AABB &box) const = 0;
 

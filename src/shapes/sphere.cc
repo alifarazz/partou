@@ -21,7 +21,7 @@ namespace partou
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // clang-format on
 
-bool Sphere::hit(const Ray& r, Float t_min, Float t_max, hit_info& info) const
+auto Sphere::hit(const Ray& r, Float t_min, Float t_max, hit_info& info) const -> bool
 {
   auto update_hit_info = [&](auto t)
   {

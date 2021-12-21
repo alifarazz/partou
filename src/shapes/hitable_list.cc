@@ -2,10 +2,10 @@
 
 namespace partou
 {
-bool HitableList::hit(const Ray& r,
+auto HitableList::hit(const Ray& r,
                       Float t_min,
                       Float t_max,
-                      hit_info& info) const
+                      hit_info& info) const -> bool
 {
   hit_info temp_hitinfo;
   bool ray_did_hit_something = false;

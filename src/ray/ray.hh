@@ -5,13 +5,13 @@
 namespace partou {
 class Ray {
 public:
-  Ray() {}
-  Ray(const partou::Vec3f &a, const partou::Vec3f &b) : A{a}, B{b} {}
+  Ray() = default;
+  Ray(const partou::Vec3f &a, const partou::Vec3f &b) : a{a}, b{b} {}
 
-  const partou::Vec3f& orig() const { return A; }
-  const partou::Vec3f& dir() const { return B; }
-  partou::Vec3f eval_at(Float t) const { return A + t * B; }
+  [[nodiscard]] auto orig() const -> const partou::Vec3f& { return a; }
+  [[nodiscard]] auto dir() const -> const partou::Vec3f& { return b; }
+  [[nodiscard]] auto eval_at(Float t) const -> partou::Vec3f { return a + t * b; }
 
-  partou::Vec3f A, B;
+  partou::Vec3f a, b;
 };
-}
+} // namespace partou

@@ -10,8 +10,7 @@ namespace partou
 template<typename PixelType>
 class FilmBuffer
 {
-private:
-  std::size_t stride;
+  std::size_t m_stride{};
 
 public:
   std::vector<PixelType> buf;
@@ -19,41 +18,41 @@ public:
   // constructor
   FilmBuffer() = default;
 
-  FilmBuffer(Vec2i ny_nx)
+  explicit FilmBuffer(Vec2i ny_nx)
       : FilmBuffer(ny_nx.y, ny_nx.x) {};
 
   template<typename T>
   requires std::is_integral_v<T> FilmBuffer(T ny, T nx)
-      : stride {static_cast<std::size_t>(nx)}
+      : m_stride {static_cast<std::size_t>(nx)}
   {
     auto n_rows = static_cast<std::size_t>(ny);
-    buf.resize(n_rows * stride);
+    buf.resize(n_rows * m_stride);
   }
 
   // 2D array to flat array and back using row-major element access
-  std::size_t get_idx(Vec2i yx) const
+  [[nodiscard]] auto get_idx(const Vec2i& yx) const -> std::size_t
   {
-    return yx.x * stride + yx.y;
+    return yx.x * m_stride + yx.y;
   }
-  Vec2i get_yx(std::size_t idx) const
+  [[nodiscard]] auto get_yx(std::size_t idx) const -> Vec2i
   {
-    auto y = static_cast<int>(idx / stride);
-    auto x = static_cast<int>(idx % stride);
+    auto y = static_cast<int>(idx / m_stride);
+    auto x = static_cast<int>(idx % m_stride);
     return {y, x};
   }
   //
-  PixelType& find_pixel_(Vec2i yx)
+  auto find_pixel(Vec2i yx) -> PixelType&
   {
     auto idx = get_idx(yx);
     return buf[idx];
   }
 
   // getter
-  PixelType& pixel_color(Vec2i coord_yx)
+  auto pixel_color(Vec2i coord_yx) -> PixelType&
   {
-    return this->find_pixel_(coord_yx);
+    return this->find_pixel(coord_yx);
   }
-  PixelType& pixel_color(int ny, int nx)
+  auto pixel_color(int ny, int nx) -> PixelType&
   {
     return this->pixel_color(Vec2i {ny, nx});
   }
@@ -65,17 +64,17 @@ public:
   }
   void pixel_color(Vec2i coord_yx, const PixelType& pixel_data) const
   {
-    this->find_pixel_(coord_yx) = pixel_data;
+    this->find_pixel(coord_yx) = pixel_data;
   }
 
   // common attrs
   auto nx() const
   {
-    return stride;
+    return m_stride;
   }
   auto ny() const
   {
-    return buf.size() / stride;
+    return buf.size() / m_stride;
   }
 };
 }  // namespace partou
