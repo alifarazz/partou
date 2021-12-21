@@ -61,7 +61,7 @@ auto main() -> int
 
   // Render
   for (int j = int(filmbuffer.ny()) - 1; j >= 0; j--) {
-    if (j & 0x00001000) // TODO: use progress bar
+    if (j & 0x00001000)  // TODO: use progress bar
       std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
     for (int i = 0; i < int(filmbuffer.nx()); i++) {
       Float u = static_cast<Float>(i) / static_cast<Float>(filmbuffer.nx() - 1);

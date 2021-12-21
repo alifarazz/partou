@@ -10,3 +10,7 @@ CMakeUserPresets.json
 project-include-after.cmake
 .directory
 .ccls*
+/partou.qbs.user
+/.qtc_clangd/
+build*/
+*.ppm
