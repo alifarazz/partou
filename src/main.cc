@@ -7,6 +7,8 @@
 //
 #include "math/general.hh"
 //
+#include "camera/PinholeCamera.hh"
+//
 #include "images/image.hh"
 #include "images/ppm.hh"
 //
@@ -42,19 +44,20 @@ auto main() -> int
   FilmBuffer<Vec3f> filmbuffer {image_height, image_width};
 
   // Camera
-  auto viewport_height = 2.0F;
-  auto viewport_width = aspect_ratio * viewport_height;
-  auto focal_length = 1.0F;
-
-  auto origin = Vec3f {0};
-  auto horizontal = Vec3f(viewport_width, 0, 0);
-  auto vertical = Vec3f(0, viewport_height, 0);
-  auto lower_left_corner = origin - horizontal / 2 - vertical / 2 - Vec3f(0, 0, focal_length);
+  const auto lookFrom = Point3f(0, 0, 1);  // Point3f(-2, 2, 1);
+  const auto lookAt = Point3f(0, 0, -1);  // Point3f(-2, 2, 1);
+  const auto vUp = Vec3f(0, 1, 0);
+  const auto fov = Degree(40);
+  PinholeCamera cam(lookFrom, lookAt, vUp, fov, aspect_ratio);
 
   // Scene
   auto world = HitableList {{
-      std::make_shared<Sphere>(Vec3f(0, 0, -0.25f), .1, nullptr),
-      std::make_shared<Sphere>(Vec3f(0, -100.5, -1), 100.0, nullptr),
+      std::make_shared<Sphere>(Point3f(0.0, -100.5, -1.0), 100.0, nullptr),
+      std::make_shared<Sphere>(Point3f(0, 0, -0.25f), .1, nullptr),
+      std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, nullptr),
+      std::make_shared<Sphere>(Point3f(-1.0, -0.5, -1.0), 0.5, nullptr),
+      std::make_shared<Sphere>(Point3f(1.0, 0.5, -1.0), 0.5, nullptr),
+
       std::make_shared<Triangle>(
           Vec3f(-0.1, 0.1, -0.25), Vec3f(0.1, 0.1, -0.25), Vec3f(0, 0, -0.25 + .15), nullptr),
       std::make_shared<Triangle>(
@@ -70,7 +73,7 @@ auto main() -> int
       Float v = static_cast<Float>(j) / static_cast<Float>(filmbuffer.ny() - 1);
       v = 1 - v;  // flip v because ppm saver is upside down :(
 
-      auto r = Ray {origin, lower_left_corner + u * horizontal + v * vertical};
+      auto r = cam.make_ray(u, v);
       auto color = color_ray(r, world);
       // std::cerr << fmt::format("{}, {} = {}", j, i, color.x) << std::endl;
       filmbuffer.pixel_color(j, i) = color;
