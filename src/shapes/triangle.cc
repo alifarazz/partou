@@ -5,10 +5,10 @@ namespace partou
 
 // from:
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
-auto Triangle::hit(const Ray& r, const Float t_min, const Float t_max, hit_info& info) const -> bool
+auto Triangle::hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const -> bool
 {
-  const Vec3f E01 = v1 - v0;
-  const Vec3f E02 = v2 - v0;
+  const math::Vec3f E01 = v1 - v0;
+  const math::Vec3f E02 = v2 - v0;
 
   const auto pv = r.dir().cross(E02);  // perpendicular vector
   const  auto det = E01.dot(pv);

@@ -19,7 +19,7 @@ public:
   // constructor
   FilmBuffer() = default;
 
-  explicit FilmBuffer(Vec2i ny_nx)
+  explicit FilmBuffer(math::Vec2i ny_nx)
       : FilmBuffer(ny_nx.y, ny_nx.x) {};
 
   template<typename T>
@@ -31,39 +31,39 @@ public:
   }
 
   // 2D array to flat array and back using row-major element access
-  [[nodiscard]] auto get_idx(const Vec2i& yx) const -> std::size_t
+  [[nodiscard]] auto get_idx(const math::Vec2i& yx) const -> std::size_t
   {
     return yx.x * m_stride + yx.y;
   }
-  [[nodiscard]] auto get_yx(std::size_t idx) const -> Vec2i
+  [[nodiscard]] auto get_yx(std::size_t idx) const -> math::Vec2i
   {
     auto y = static_cast<int>(idx / m_stride);
     auto x = static_cast<int>(idx % m_stride);
     return {y, x};
   }
   //
-  auto find_pixel(Vec2i yx) -> PixelType&
+  auto find_pixel(math::Vec2i yx) -> PixelType&
   {
     auto idx = get_idx(yx);
     return buf[idx];
   }
 
   // getter
-  auto pixel_color(Vec2i coord_yx) -> PixelType&
+  auto pixel_color(math::Vec2i coord_yx) -> PixelType&
   {
     return this->find_pixel(coord_yx);
   }
   auto pixel_color(int ny, int nx) -> PixelType&
   {
-    return this->pixel_color(Vec2i {ny, nx});
+    return this->pixel_color(math::Vec2i {ny, nx});
   }
 
   // setter
   void pixel_color(int ny, int nx, const PixelType& pixel_data) const
   {
-    this->pixel_color(Vec2i {ny, nx}, pixel_data);
+    this->pixel_color(math::Vec2i {ny, nx}, pixel_data);
   }
-  void pixel_color(Vec2i coord_yx, const PixelType& pixel_data) const
+  void pixel_color(math::Vec2i coord_yx, const PixelType& pixel_data) const
   {
     this->find_pixel(coord_yx) = pixel_data;
   }

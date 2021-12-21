@@ -17,10 +17,10 @@ public:
   {
   }
   auto hit(const Ray& r,
-           Float t_min,
-           Float t_max,
+           math::Float t_min,
+           math::Float t_max,
            hit_info& info) const -> bool override;
-  // virtual bool bounding_box(Float t0, Float t1, AABB& box) const;
+  // virtual bool bounding_box(math::Float t0, math::Float t1, AABB& box) const;
 
   auto begin();
   auto end();

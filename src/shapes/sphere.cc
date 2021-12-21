@@ -21,7 +21,7 @@ namespace partou
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // clang-format on
 
-auto Sphere::hit(const Ray& r, Float t_min, Float t_max, hit_info& info) const -> bool
+auto Sphere::hit(const Ray& r, math::Float t_min, math::Float t_max, hit_info& info) const -> bool
 {
   auto update_hit_info = [&](auto t)
   {
@@ -46,10 +46,10 @@ auto Sphere::hit(const Ray& r, Float t_min, Float t_max, hit_info& info) const -
 
   info.mat_ptr = mat_ptr;
   auto oc = r.orig() - this->center;  // A - c
-  Float a = r.dir().length2();
-  Float half_b = oc.dot(r.dir());
-  Float c = oc.length2() - math::pow2(this->radius);
-  Float delta_2 = half_b * half_b - a * c;
+  math::Float a = r.dir().length2();
+  math::Float half_b = oc.dot(r.dir());
+  math::Float c = oc.length2() - math::pow2(this->radius);
+  math::Float delta_2 = half_b * half_b - a * c;
 
   // We discard the case with single answer because it's numerically unstable to
   // calculate it using floating point numbers. Plus, we need to find the
@@ -70,7 +70,7 @@ auto Sphere::hit(const Ray& r, Float t_min, Float t_max, hit_info& info) const -
   return false;
 }
 
-// bool Sphere::bounding_box(Float t0, Float t1, AABB& box) const
+// bool Sphere::bounding_box(math::Float t0, math::Float t1, AABB& box) const
 // {
 //   vec3 r {radius, radius, radius};
 //   box = AABB(center - r, center + r);

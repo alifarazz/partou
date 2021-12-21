@@ -1,23 +1,18 @@
 #pragma once
 
+#include "general.hh"
 #include <Imath/ImathVec.h>
 // #include <glm/vec2.hpp>
 // #include <glm/vec3.hpp>
 // #include <glm/vec4.hpp>
 
-namespace partou
+namespace partou::math
 {
-#ifdef FLOAT_IS_64_BIT
-using Float = double;
-#else
-using Float = float;
-#endif
-using Double = double;
 
 // there are useless
-//using Short = std::int16_t;
-//using Int = std::int32_t;
-//using Long = std::int64_t;
+// using Short = std::int16_t;
+// using Int = std::int32_t;
+// using Long = std::int64_t;
 
 // using Vec2l = glm::i64vec2;
 // using Vec2i = glm::i32vec2;
@@ -37,7 +32,6 @@ using Double = double;
 // using Vec4f = glm::vec4;
 // using Vec4d = glm::dvec4;
 
-
 using Vec2l = Imath::Vec2<std::int64_t>;
 using Vec2i = Imath::Vec2<std::int32_t>;
 using Vec2s = Imath::Vec2<std::int16_t>;
@@ -55,5 +49,8 @@ using Vec4i = Imath::Vec4<std::int32_t>;
 using Vec4s = Imath::Vec4<std::int16_t>;
 using Vec4f = Imath::Vec4<Float>;
 using Vec4d = Imath::Vec4<Double>;
+
+using Point3f = Vec3f;
+using Point3d = Vec3d;
 
 }  // namespace partou

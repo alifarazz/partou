@@ -14,13 +14,12 @@ struct hit_info
 {
   bool is_front_facing;  // whether the ray is inside the object, or on the
                          // surface and outside of it
-  Float t;
+  math::Float t;
   Material* mat_ptr;  /// fix me pls, I can be both a const and a ref
-  Vec3f p;
-  Vec3f normal;
+  math::Vec3f p;
+  math::Vec3f normal;
 
-  inline auto set_surface_normal(const Ray& r,
-                                 const Vec3f& outward_surface_normal)
+  inline auto set_surface_normal(const Ray& r, const math::Vec3f& outward_surface_normal)
   {
     is_front_facing = outward_surface_normal.dot(-r.dir()) > 0;
     normal = is_front_facing ? outward_surface_normal : -outward_surface_normal;
@@ -30,10 +29,7 @@ struct hit_info
 class Hitable
 {
 public:
-  virtual auto hit(const Ray& r,
-                   float t_min,
-                   float t_max,
-                   hit_info& info) const -> bool = 0;
+  virtual auto hit(const Ray& r, float t_min, float t_max, hit_info& info) const -> bool = 0;
 
   // virtual bool bounding_box(float t0, float t1, AABB &box) const = 0;
 

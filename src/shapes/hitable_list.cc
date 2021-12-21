@@ -3,8 +3,8 @@
 namespace partou
 {
 auto HitableList::hit(const Ray& r,
-                      Float t_min,
-                      Float t_max,
+                      math::Float t_min,
+                      math::Float t_max,
                       hit_info& info) const -> bool
 {
   hit_info temp_hitinfo;
@@ -31,7 +31,7 @@ auto HitableList::end()
   return hitables.end();
 }
 
-// bool HitableList::bounding_box(Float t0, Float t1, AABB& box) const
+// bool HitableList::bounding_box(math::Float t0, math::Float t1, AABB& box) const
 // {
 //   if (count < 1)
 //     return false;
