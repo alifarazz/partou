@@ -16,7 +16,7 @@ class PPMImageSaver {
   static constexpr auto rgb_256_max_minus_eps = 255.999;
 
   auto make_throw_error_message_out_of_bounds(std::size_t i,
-                                              const Vec3f& pixel_color) {
+                                              const Vec3f& pixel_color) const {
     using namespace std::string_literals;
     const auto yx = filmbuffer.get_yx(i);
     const auto coord_s =
@@ -33,7 +33,7 @@ class PPMImageSaver {
   explicit PPMImageSaver(FilmBuffer<PixelType>& filmbuffer)
       : filmbuffer{filmbuffer} {}
   //
-  auto save(std::ostream& out) {
+  auto save(std::ostream& out) const {
     cli::ProgressBar pb{filmbuffer.buf.size() - 1, "PPMImageSaver.save: ", 4};
     out << "P3\n" << filmbuffer.nx() << " " << filmbuffer.ny() << "\n255\n";
 

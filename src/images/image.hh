@@ -10,6 +10,7 @@ namespace partou
 template<typename PixelType>
 class FilmBuffer
 {
+private:
   std::size_t m_stride{};
 
 public:
