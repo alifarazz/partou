@@ -5,7 +5,11 @@ namespace partou
 
 // from:
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
-auto Triangle::hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const -> bool
+// https://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/code/raytri_tam.pdf
+auto Triangle::hit(const Ray& r,
+                   const math::Float t_min,
+                   const math::Float t_max,
+                   hit_info& info) const -> bool
 {
   const math::Vec3f E01 = v1 - v0;
   const math::Vec3f E02 = v2 - v0;
