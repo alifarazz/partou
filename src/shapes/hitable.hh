@@ -14,6 +14,7 @@ struct hit_info
 {
   bool is_front_facing;  // whether the ray is inside the object, or on the
                          // surface and outside of it
+  int i;
   math::Float t;
   Material* mat_ptr;  /// fix me pls, I can be both a const and a ref
   math::Vec3f p;

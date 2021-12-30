@@ -40,9 +40,13 @@ public:
     cli::ProgressBar pb {filmbuffer.buf.size() - 1, "PPMImageSaver.save: ", 4};
     out << "P3\n" << filmbuffer.nx() << " " << filmbuffer.ny() << "\n255\n";
 
+    constexpr auto rgbEpsilon = 0.000001;  // Increase if `out-of-bounds` throw happens
     std::size_t i {};
     for (const auto& pixel_color : filmbuffer.buf) {  // should've used rsv::enumerate
-      if (pixel_color.x > 1. || pixel_color.y > 1. || pixel_color.z > 1.) {
+      if (pixel_color.x > 1. + rgbEpsilon || pixel_color.y > 1. + rgbEpsilon
+          || pixel_color.z > 1. + rgbEpsilon || pixel_color.x < -rgbEpsilon
+          || pixel_color.y < -rgbEpsilon || pixel_color.z < -rgbEpsilon)
+      {
         const auto mesg = make_throw_error_message_out_of_bounds(i, pixel_color);
         throw std::invalid_argument {mesg};
       }

@@ -9,6 +9,8 @@ CppApplication {
 "src/camera/PinholeCamera.hh",
 "src/images/image.hh",
 "src/images/ppm.hh",
+"src/io/obj.cc",
+"src/io/obj.hh",
 "src/main.cc",
 "src/math/general.hh",
 "src/math/vec.hh",
@@ -17,6 +19,8 @@ CppApplication {
 "src/shapes/hitable.hh",
 "src/shapes/hitable_list.cc",
 "src/shapes/hitable_list.hh",
+"src/shapes/mesh.cc",
+"src/shapes/mesh.hh",
 "src/shapes/sphere.cc",
 "src/shapes/sphere.hh",
 "src/shapes/triangle.cc",
@@ -24,6 +28,7 @@ CppApplication {
 "src/utils/progress_bar.hh",
         ]
     cpp.cxxLanguageVersion: "c++20"
+    cpp.cxxFlags: "-O3"
 
     Group {     // Properties for the produced executable
         fileTagsFilter: "application"
