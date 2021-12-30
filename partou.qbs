@@ -2,6 +2,8 @@ import qbs
 
 CppApplication {
     consoleApplication: true
+
+    // generated with $ fd ".*\.(hh|cc)" src | xargs -I W echo \"W\",
     files:
         [
 "src/camera/Camera.hh",
