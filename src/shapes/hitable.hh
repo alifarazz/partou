@@ -4,8 +4,10 @@
 
 #include "../math/general.hh"
 #include "../math/vec.hh"
-// #include "AABB.hxx"
+//
 #include "../ray/ray.hh"
+//
+#include "../accel/AABB.hh"
 
 namespace partou
 {
@@ -31,8 +33,12 @@ struct hit_info
 class Hitable
 {
 public:
-  virtual ~Hitable() {}
+  accel::AABB aabb() const
+  {
+    return m_aabb;
+  }
 
+  virtual ~Hitable() {}
   virtual auto hit(const Ray& r,
                    const math::Float t_min,
                    const math::Float t_max,
@@ -54,6 +60,8 @@ public:
   // }
 protected:
   Hitable() = default;
+
+  accel::AABB m_aabb;
 };
 
 }  // namespace partou

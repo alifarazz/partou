@@ -1,8 +1,28 @@
 #include "triangle.hh"
+
 #include "../perf_stats/stats.hh"
 
 namespace partou
 {
+
+Triangle::Triangle(const math::Vec3f& v0,
+                   const math::Vec3f& v1,
+                   const math::Vec3f& v2,
+                   Material* matp)
+    : v0 {v0}
+    , v1 {v1}
+    , v2 {v2}
+    , mat_ptr {matp}
+{
+  this->computeBB();
+}
+
+auto Triangle::computeBB() -> void
+{
+  this->m_aabb = accel::AABB();
+  for (const auto& v : {v0, v1, v2})
+    (this->m_aabb).merge(v);
+}
 
 // from:
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection

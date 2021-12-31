@@ -1,9 +1,24 @@
 #include "sphere.hh"
 
+#include "../accel/AABB.hh"
 #include "../math/general.hh"
 
 namespace partou
 {
+Sphere::Sphere(const math::Point3f& center, math::Float r, Material* matp)
+    : center {center}
+    , radius {r}
+    , mat_ptr {matp}
+{
+  computeBB();
+}
+
+auto Sphere::computeBB() -> void
+{
+  const auto offset = decltype(this->center) {this->radius};
+  this->m_aabb = accel::AABB(this->center - offset, this->center + offset);
+}
+
 // clang-format off
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // # Solve for solutions of a 2nd degree equation.                                                          //
@@ -21,14 +36,16 @@ namespace partou
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // clang-format on
 
-auto Sphere::hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const -> bool
+auto Sphere::hit(const Ray& r,
+                 const math::Float t_min,
+                 const math::Float t_max,
+                 hit_info& info) const -> bool
 {
   auto update_hit_info = [&](auto t)
   {
     info.t = t;  // t_min <= t < t_max
     info.p = r.eval_at(t);  // p is on the surface of the sphere
-    auto surface_normal =
-        ((info.p - this->center) / this->radius);  //.normalize();  // fix me!!!
+    auto surface_normal = ((info.p - this->center) / this->radius);  //.normalize();  // fix me!!!
     info.set_surface_normal(r, surface_normal);
     // if (i++ == 10) {
     //   std::cerr << "center:  " << this->center << "\n";

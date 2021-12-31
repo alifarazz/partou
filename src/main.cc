@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -25,15 +26,19 @@
 #include "perf_stats/stats.hh"
 
 using namespace partou::math;
+using Time = std::chrono::high_resolution_clock;
+using fsec = std::chrono::duration<float>;
 
-auto color_ray(const partou::Ray& r, const partou::Hitable& world) -> Vec3f
+auto traceRay(const partou::Ray& r, const partou::Hitable& world) -> Vec3f
 {
   using namespace partou;
 
   hit_info hinfo;
-  if (world.hit(r, 0.0, std::numeric_limits<Float>::max(), hinfo)) {
+  math::Float tBB;
+
+  if (world.aabb().intersect(r, tBB) && world.hit(r, 0.0, std::numeric_limits<Float>::max(), hinfo))
     return (hinfo.normal + Vec3f(1.0F)) / 2.0F;
-  }
+
   // color background: horizontal gradiant
   auto unit_dir = r.dir().normalized();
   auto t = (unit_dir.y + 1.0F) / 2.0F;
@@ -46,7 +51,7 @@ auto main() -> int
 
   // Film
   const auto aspect_ratio = 16.0F / 9.0F;
-  const int image_width = 800;
+  const int image_width = 1000;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
   FilmBuffer<Vec3f> filmbuffer {image_height, image_width};
 
@@ -77,11 +82,11 @@ auto main() -> int
            std::make_shared<Triangle>(
                Vec3f(1, 1, -2), Vec3f(1, -1, -2), Vec3f(-1, -1, -2), nullptr),
        }})}};
-  const auto cube = shape::Mesh {io::OBJ_Loader("./cube.obj")};
+  // const auto cube = shape::Mesh {io::OBJ_Loader("./cube.obj")};
   const auto suzanne = shape::Mesh {io::OBJ_Loader("./suzanne.obj")};
 
   // Render
-  clock_t timeStart = clock();
+  auto timeStart = Time::now();
   for (int j = int(filmbuffer.ny()) - 1; j >= 0; j--) {
     if (j & 0x00001000)  // TODO: use progress bar
       std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
@@ -92,34 +97,42 @@ auto main() -> int
 
       auto r = cam.make_ray(u, v);
       partou::stats::numPrimaryRays++;
-      // auto color = color_ray(r, world);
-      auto color = color_ray(r, suzanne);
+      auto color = traceRay(r, world);
+      // auto color = traceRay(r, suzanne);
       // std::cerr << fmt::format("{}, {} = {}", j, i, color.x) << std::endl;
       filmbuffer.pixel_color(j, i) = color;
     }
   }
-  clock_t timeEnd = clock();
+  auto timeEnd = Time::now();
 
   // for (auto i : std::ranges::iota_view{2, 8})
   //   filmbuffer.pixel_color(i, 9) = Vec3f{1, 1, 1};
 
   auto saver = PPMImageSaver {filmbuffer};
-  std::ofstream outputStream {"./out.ppm"};
+  const auto outputfilename = "./out_aabb_hitablelist.ppm";
+  // const auto outputfilename = "./out_aabb.ppm";
+  std::ofstream outputStream {outputfilename};
   saver.save(outputStream);
 
   //////
   //////
-
-  printf("Render time                                 : %04.2f (sec)\n",
-         static_cast<float>(timeEnd - timeStart) / CLOCKS_PER_SEC);
-  // printf("Total number of triangles                   : %d\n", totalNumTris);
-  printf("Total number of primary rays                : %lu\n",
-         partou::stats::numPrimaryRays.load());
-  printf("Total number of ray-triangles tests         : %lu\n",
-         partou::stats::numRayTrianglesTests.load());
-  printf("Total number of ray-triangles intersections : %lu\n",
-         partou::stats::numRayTrianglesIsect.load());
-  printf("Ray-triangles tests/intersects              : %04.6f%%\n",
-         static_cast<float>(partou::stats::numRayTrianglesIsect.load())
-             / partou::stats::numRayTrianglesTests.load() * 100);
+  fsec fs = timeEnd - timeStart;
+  std::cout << "Render time                                 : " << fs.count() << " sec"
+            << std::endl;
+  // std::cout << "Total number of triangles                   : " << stats::numTriangles.load()
+  //           << std::endl;
+  std::cout << "Total number of primary rays                : " << stats::numPrimaryRays.load()
+            << std::endl;
+  std::cout << "Total number of ray-bbox tests              : " << stats::numRayBBoxTests.load()
+            << std::endl;
+  // std::cout << "Total number of ray-boundvolume tests       : "
+  //           << stats::numRayBoundingVolumeTests.load() << qtd::endl;
+  std::cout << "Total number of ray-triangles tests         : "
+            << stats::numRayTrianglesTests.load() << std::endl;
+  std::cout << "Total number of ray-triangles intersections : "
+            << stats::numRayTrianglesIsect.load() << std::endl;
+  std::cout << "Ray-triangles tests/intersects              : "
+            << static_cast<float>(partou::stats::numRayTrianglesIsect.load())
+                   / partou::stats::numRayTrianglesTests.load() * 100
+            << "%" << std::endl;
 }

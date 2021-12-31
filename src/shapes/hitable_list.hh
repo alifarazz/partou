@@ -11,11 +11,9 @@ namespace partou
 class HitableList : public Hitable
 {
 public:
-  HitableList() = default;
-  explicit HitableList(std::vector<std::shared_ptr<const Hitable>> hitable_vector)
-      : hitables {std::move(hitable_vector)}
-  {
-  }
+  HitableList() = delete;
+  explicit HitableList(std::vector<std::shared_ptr<const Hitable>> hitable_vector);
+
   auto hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const
       -> bool override;
   // virtual bool bounding_box(math::Float t0, math::Float t1, AABB& box) const;
@@ -23,7 +21,10 @@ public:
   auto begin();
   auto end();
 
-  std::vector<std::shared_ptr<const Hitable>> hitables;
+  std::vector<std::shared_ptr<const Hitable>> m_hitables;
+
+    protected:
+    auto computeBB() -> void;
 };
 
 }  // namespace partou

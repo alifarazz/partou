@@ -6,6 +6,7 @@ CppApplication {
     // generated with $ fd ".*\.(hh|cc)" src | xargs -I W echo \"W\",
     files:
         [
+ "src/accel/AABB.cc",
 "src/accel/AABB.hh",
 "src/camera/Camera.hh",
 "src/camera/PinholeCamera.cc",

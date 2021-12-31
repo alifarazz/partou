@@ -17,10 +17,11 @@ namespace shape
 class Mesh : public Hitable
 {
 public:
-  Mesh() = default;
-  explicit Mesh(const std::vector<Triangle>& tris)
-      : m_tris {tris} {};
+  Mesh() = delete;
+  explicit Mesh(const std::vector<Triangle>& tris);
   explicit Mesh(const io::OBJ_Loader& objLoader);
+
+  void computeBB();
 
   auto hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const
       -> bool override;
