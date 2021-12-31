@@ -3,8 +3,8 @@
 namespace partou
 {
 auto HitableList::hit(const Ray& r,
-                      math::Float t_min,
-                      math::Float t_max,
+                      const math::Float t_min,
+                      const math::Float t_max,
                       hit_info& info) const -> bool
 {
   hit_info temp_hitinfo;

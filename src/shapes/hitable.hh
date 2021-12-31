@@ -2,6 +2,7 @@
 
 #include <cmath>
 
+#include "../math/general.hh"
 #include "../math/vec.hh"
 // #include "AABB.hxx"
 #include "../ray/ray.hh"
@@ -30,9 +31,14 @@ struct hit_info
 class Hitable
 {
 public:
-  virtual auto hit(const Ray& r, float t_min, float t_max, hit_info& info) const -> bool = 0;
+  virtual ~Hitable() {}
 
-  // virtual bool bounding_box(float t0, float t1, AABB &box) const = 0;
+  virtual auto hit(const Ray& r,
+                   const math::Float t_min,
+                   const math::Float t_max,
+                   hit_info& info) const -> bool = 0;
+
+  // virtual bool bounding_box(math::Float t0, math::Float t1, AABB &box) const = 0;
 
   // AABB surrounding_box(const AABB& box0, const AABB& box1) const {
   //   auto fmin{AABB::ffmin}, fmax{AABB::ffmax};
