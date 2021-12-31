@@ -21,6 +21,8 @@
 #include "shapes/mesh.hh"
 #include "shapes/sphere.hh"
 #include "shapes/triangle.hh"
+//
+#include "perf_stats/stats.hh"
 
 using namespace partou::math;
 
@@ -79,6 +81,7 @@ auto main() -> int
   const auto suzanne = shape::Mesh {io::OBJ_Loader("./suzanne.obj")};
 
   // Render
+  clock_t timeStart = clock();
   for (int j = int(filmbuffer.ny()) - 1; j >= 0; j--) {
     if (j & 0x00001000)  // TODO: use progress bar
       std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
@@ -88,17 +91,35 @@ auto main() -> int
       v = 1 - v;  // flip v because ppm saver is upside down :(
 
       auto r = cam.make_ray(u, v);
+      partou::stats::numPrimaryRays++;
       // auto color = color_ray(r, world);
       auto color = color_ray(r, suzanne);
       // std::cerr << fmt::format("{}, {} = {}", j, i, color.x) << std::endl;
       filmbuffer.pixel_color(j, i) = color;
     }
   }
+  clock_t timeEnd = clock();
 
   // for (auto i : std::ranges::iota_view{2, 8})
   //   filmbuffer.pixel_color(i, 9) = Vec3f{1, 1, 1};
 
   auto saver = PPMImageSaver {filmbuffer};
-  std::ofstream outputStream{"./out.ppm"};
+  std::ofstream outputStream {"./out.ppm"};
   saver.save(outputStream);
+
+  //////
+  //////
+
+  printf("Render time                                 : %04.2f (sec)\n",
+         static_cast<float>(timeEnd - timeStart) / CLOCKS_PER_SEC);
+  // printf("Total number of triangles                   : %d\n", totalNumTris);
+  printf("Total number of primary rays                : %lu\n",
+         partou::stats::numPrimaryRays.load());
+  printf("Total number of ray-triangles tests         : %lu\n",
+         partou::stats::numRayTrianglesTests.load());
+  printf("Total number of ray-triangles intersections : %lu\n",
+         partou::stats::numRayTrianglesIsect.load());
+  printf("Ray-triangles tests/intersects              : %04.6f%%\n",
+         static_cast<float>(partou::stats::numRayTrianglesIsect.load())
+             / partou::stats::numRayTrianglesTests.load() * 100);
 }

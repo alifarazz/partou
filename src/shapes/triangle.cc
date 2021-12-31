@@ -1,4 +1,5 @@
 #include "triangle.hh"
+#include "../perf_stats/stats.hh"
 
 namespace partou
 {
@@ -11,6 +12,7 @@ auto Triangle::hit(const Ray& r,
                    const math::Float t_max,
                    hit_info& info) const -> bool
 {
+  partou::stats::numRayTrianglesTests++;
   const math::Vec3f E01 = v1 - v0;
   const math::Vec3f E02 = v2 - v0;
 
@@ -43,6 +45,9 @@ auto Triangle::hit(const Ray& r,
   info.t = t;
   const auto normal = E01.cross(E02).normalize();
   info.set_surface_normal(r, normal);
+
+  partou::stats::numRayTrianglesIsect++;
+
   return true;
 }
 }  // namespace partou
