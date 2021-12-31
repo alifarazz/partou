@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -98,5 +99,6 @@ auto main() -> int
   //   filmbuffer.pixel_color(i, 9) = Vec3f{1, 1, 1};
 
   auto saver = PPMImageSaver {filmbuffer};
-  saver.save(std::cout);
+  std::ofstream outputStream{"./out.ppm"};
+  saver.save(outputStream);
 }
