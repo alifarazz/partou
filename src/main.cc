@@ -117,6 +117,7 @@ auto main() -> int
   //////
   //////
   fsec fs = timeEnd - timeStart;
+  std::cout << std::string(80, '-') << std::endl;
   std::cout << "Render time                                 : " << fs.count() << " sec"
             << std::endl;
   // std::cout << "Total number of triangles                   : " << stats::numTriangles.load()

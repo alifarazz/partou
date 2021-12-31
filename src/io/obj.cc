@@ -20,7 +20,7 @@ int OBJ_Loader::load(const std::filesystem::path& path)
     std::cerr << std::endl << "OBJ::load, " << path.string() << " not found.\n";
     return -2;
   }
-  std::cerr << std::endl << "OBJ::load, start\n";
+  std::cerr << "OBJ::load-> begin\t" << path.filename() << '\n';
 
   std::ifstream file {path};
   std::string line;
@@ -37,16 +37,16 @@ int OBJ_Loader::load(const std::filesystem::path& path)
       ss >> s1 >> s2 >> s3;
       std::array<std::size_t, 3> indices {
           getVertexIndex(s1) - 1, getVertexIndex(s2) - 1, getVertexIndex(s3) - 1};
-      for (auto i : indices)
-        if (i < 0) {
-          std::cerr << "OBJ::load::face, bad idx.\n";
-          return -1;
-        }
+      // for (const auto i : indices) // std::size_t is unsigned
+      //   if (i < 0) {
+      //     std::cerr << "OBJ::load::face, bad idx.\n";
+      //     return -1;
+      //   }
       m_faces.push_back(indices);
     }
   }
 
-  std::cerr << std::endl << "OBJ::load, end\n";
+  std::cerr << "OBJ::load-> end  \t" << path.filename() << '\n';
   return 0;
 }
 
