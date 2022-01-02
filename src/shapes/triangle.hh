@@ -21,8 +21,12 @@ public:
   // virtual bool bounding_box(float t0, float t1, AABB& box) const;
   auto computeBB() -> void;
 
+protected:
+  // underscore at the end of the name means it'll be precomputed (for example, in the constructor)
   math::Vec3f v0, v1, v2;
-  Material* mat_ptr;
+  math::Vec3f E01_, E02_;  // precomputed barycentric axis
+  // math::Vec3f normal_;  // precomputed normal of the plane in which the triangle resides
+  math::Vec3f vn0, vn1, vn2;
 
 protected:
 };
