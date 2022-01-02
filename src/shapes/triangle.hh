@@ -10,16 +10,24 @@ namespace partou
 class Triangle : public Hitable
 {
 public:
-  Triangle() = default; // should never be used actually
+  Triangle() = default;  // should never be used actually
   Triangle(const math::Vec3f& v0,
            const math::Vec3f& v1,
            const math::Vec3f& v2,
-           Material* matp)  // fix the material raw ptr
-      ;
+           Material* matp);  // fix the material raw ptr
+  Triangle(const math::Vec3f& v0,
+           const math::Vec3f& v1,
+           const math::Vec3f& v2,
+           const math::Vec3f& vn0,
+           const math::Vec3f& vn1,
+           const math::Vec3f& vn2,
+           Material* matp);  // fix the material raw ptr
+
   auto hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const
       -> bool override;
   // virtual bool bounding_box(float t0, float t1, AABB& box) const;
   auto computeBB() -> void;
+  auto interpolatedNormal(const math::Vec2f& st) const -> math::Vec3f;
 
 protected:
   // underscore at the end of the name means it'll be precomputed (for example, in the constructor)
@@ -28,6 +36,6 @@ protected:
   // math::Vec3f normal_;  // precomputed normal of the plane in which the triangle resides
   math::Vec3f vn0, vn1, vn2;
 
-protected:
+  Material* mat_ptr;
 };
 }  // namespace partou
