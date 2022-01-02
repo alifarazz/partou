@@ -34,7 +34,9 @@ CppApplication {
 "src/utils/progress_bar.hh",
         ]
     cpp.cxxLanguageVersion: "c++20"
-    cpp.cxxFlags: "-O3"
+    cpp.cxxFlags: ["-Ofast","-funroll-loops","-march=native","-mtune=native","-flto"]
+
+    cpp.warningLevel: "all"
 
     Group {     // Properties for the produced executable
         fileTagsFilter: "application"

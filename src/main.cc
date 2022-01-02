@@ -34,7 +34,7 @@ using fsec = std::chrono::duration<float>;
 
 ////// globals
 const auto aspect_ratio = 4.F / 3.F;  // 16.0F / 9.0F;
-const int image_width = 1024;
+const int image_width = 1024 / 2;
 const int image_height = static_cast<int>(image_width / aspect_ratio);
 const int spp_sqrt = 2;
 
@@ -91,7 +91,8 @@ auto main(int argc, char* argv[]) -> int
 
   // Camera
   const auto lookFrom = Point3f(0, 0, 4);  // Point3f(-2, 2, 1);
-  const auto lookAt = Point3f(0, 0, -1);  // Point3f(-2, 2, 1);
+  // const auto lookFrom = Point3f(-2, 2, 1);
+  const auto lookAt = Point3f(0, 0, -1);
   const auto vUp = Vec3f(0, 1, 0);
   const auto fov = Degree(45);
   PinholeCamera cam(lookFrom, lookAt, vUp, fov, aspect_ratio);
@@ -117,11 +118,11 @@ auto main(int argc, char* argv[]) -> int
                Vec3f(1, 1, -2), Vec3f(1, -1, -2), Vec3f(-1, -1, -2), nullptr),
        }})}};
 
-  // const auto cube = shape::Mesh {io::OBJ_Loader("./cube.obj")};
-  const auto suzanne = shape::Mesh {io::OBJ_Loader("./suzanne.obj")};
-  const auto bunny1440 = shape::Mesh {io::OBJ_Loader("stanford_bunny_1440.obj")};
-  // const auto bunny2880 = shape::Mesh{io::OBJ_Loader("stanford_bunny_2880.obj")};
-  // const auto dragon8710 = shape::Mesh {io::OBJ_Loader("stanford_dragon_8710.obj")};
+  // const auto cube = shape::Mesh {io::loader::OBJ("./cube.obj")};
+  const auto suzanne = shape::Mesh {io::loader::OBJ("./suzanne.obj", true)};
+  const auto bunny1440 = shape::Mesh {io::loader::OBJ("stanford_bunny_1440.obj", true)};
+  // const auto bunny2880 = shape::Mesh{io::loader::OBJ("stanford_bunny_2880.obj")};
+  // const auto dragon8710 = shape::Mesh {io::loader::OBJ("stanford_dragon_8710.obj")};
 
   const auto monkey_bunny = HitableList {{
       std::make_shared<shape::Mesh>(suzanne),
@@ -134,7 +135,7 @@ auto main(int argc, char* argv[]) -> int
   auto timeStart = Time::now();
   for (int j = int(filmbuffer.ny()) - 1; j >= 0; j--) {
     if (j % 1 << 12 == 0)  // TODO: use progress bar
-      std::cerr << "\rtraceRay-> Scanlines remaining:\t" << j << ' ' << std::flush;
+      std::cerr << "\rtraceRay-> Scanlines remaining:\t\t" << j << ' ' << std::flush;
 
     for (int i = 0; i < int(filmbuffer.nx()); i++) {
       filmbuffer.pixel_color(j, i) = samplePixel(cam, world, i, j);

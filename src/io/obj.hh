@@ -7,23 +7,28 @@
 
 #include "../math/vec.hh"
 
-namespace partou
+namespace partou::io::loader
 {
-namespace io
-{
-class OBJ_Loader
+class OBJ
 {
 public:
-  std::vector<math::Point3f> m_vertices;
-  std::vector<std::array<std::size_t, 3>> m_faces;
+  std::string m_name {"partou_empty_obj_name"};
+  std::vector<math::Point3f> m_vertices {};
+  std::vector<math::Point3f> m_vertexNormals {};
+  std::vector<std::array<std::size_t, 3>> m_facesV {};
+  std::vector<std::array<std::size_t, 3>> m_facesVN {};
 
-  OBJ_Loader() = default;
-  explicit OBJ_Loader(const std::filesystem::path& path);
+  OBJ() = default;
+  explicit OBJ(const std::filesystem::path& path, bool load_normals = false);
 
-  int load(const std::filesystem::path& path);
+  int load(const std::filesystem::path& path, bool load_normals = false);
+  bool loaded_normals() const;
 
 protected:
-  std::size_t getVertexIndex(const std::string& s);
+  bool addVertex(std::stringstream& ss);
+  bool addVertexNormal(std::stringstream& ss);
+  bool addTriangularFace(std::stringstream& ss, bool load_normals);
+
+  std::size_t getIndexTriplet(const std::string& token, unsigned int location = 0u) const;
 };
-}  // namespace io
-}  // namespace partou
+}  // namespace partou::io::loader
