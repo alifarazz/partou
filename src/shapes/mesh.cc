@@ -47,6 +47,12 @@ Mesh::Mesh(const io::loader::OBJ& objLoader)
   this->computeBoundingBox();
 }
 
+auto Mesh::apply(const math::spatial::Transform& tModel) -> Mesh&&
+{
+  this->transformModel(tModel);
+  return std::move(*this);
+}
+
 auto Mesh::transformModel(const math::spatial::Transform& tModel) -> void
 {
   for (auto& tri : m_tris)

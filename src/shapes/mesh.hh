@@ -21,7 +21,8 @@ public:
   explicit Mesh(const std::vector<Triangle>& tris);
   explicit Mesh(const io::loader::OBJ& objLoader);
 
-  void computeBoundingBox();
+  auto apply(const math::spatial::Transform& tModel) -> Mesh&&;
+  auto computeBoundingBox() -> void;
 
   auto hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const
       -> bool final override;

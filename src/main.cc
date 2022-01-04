@@ -97,6 +97,10 @@ auto main(int argc, char* argv[]) -> int
   const auto fov = Degree(45);
   PinholeCamera cam(lookFrom, lookAt, vUp, fov, aspect_ratio);
 
+  // Transform
+  const auto lookLeft = spatial::Transform {Vec3f {0}, Vec3f {1}, Vec3f {0, PI / 6, 0}};
+  const auto lookRight = spatial::Transform {Vec3f {0}, Vec3f {1}, Vec3f {0, -PI / 6, 0}};
+
   // Scene
   const auto testSpheres = HitableList {
       {std::make_shared<Sphere>(Point3f(0.0, -100.5, -1.0), 100.0, nullptr),
@@ -119,12 +123,12 @@ auto main(int argc, char* argv[]) -> int
        }})}};
 
   // const auto cube = shape::Mesh {io::loader::OBJ("./cube.obj")};
-  auto suzanne = shape::Mesh {io::loader::OBJ("./suzanne.obj", true)};
-  const auto bunny1440 = shape::Mesh {io::loader::OBJ("stanford_bunny_1440.obj", true)};
+  const auto suzanne = shape::Mesh {io::loader::OBJ("./suzanne.obj", true)}.apply(lookLeft);
+  const auto bunny1440 =
+      shape::Mesh {io::loader::OBJ("stanford_bunny_1440.obj", true)}.apply(lookRight);
   // const auto bunny2880 = shape::Mesh{io::loader::OBJ("stanford_bunny_2880.obj")};
   // const auto dragon8710 = shape::Mesh {io::loader::OBJ("stanford_dragon_8710.obj")};
 
-  suzanne.transformModel(spatial::Transform {Vec3f {0}, Vec3f {1}, Vec3f{0, PI / 6, 0}});
   const auto monkey_bunny = HitableList {{
       std::make_shared<shape::Mesh>(suzanne),
       // std::make_shared<shape::Mesh>(bunny1440),
