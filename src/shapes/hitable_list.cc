@@ -8,15 +8,19 @@ namespace partou
 HitableList::HitableList(std::vector<std::shared_ptr<const Hitable>> hitable_vector)
     : m_hitables {std::move(hitable_vector)}
 {
-  computeBB();
+  computeBoundingBox();
 }
 
-auto HitableList::computeBB() -> void
+auto HitableList::computeBoundingBox() -> void
 {
   this->m_aabb = accel::AABB();
-  for (const auto &h: m_hitables){
+  for (const auto& h : m_hitables) {
     this->m_aabb.merge(h->aabb());
   }
+}
+
+auto HitableList::transformModel(const math::spatial::Transform& /* tModel */) -> void
+{  // noop
 }
 
 auto HitableList::hit(const Ray& r,

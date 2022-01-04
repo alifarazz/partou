@@ -8,6 +8,8 @@
 #include "../ray/ray.hh"
 //
 #include "../accel/AABB.hh"
+//
+#include "../math/transform.hh"
 
 namespace partou
 {
@@ -43,6 +45,7 @@ public:
                    const math::Float t_min,
                    const math::Float t_max,
                    hit_info& info) const -> bool = 0;
+  virtual auto transformModel(const math::spatial::Transform& tModel) -> void = 0;
 
   // virtual bool bounding_box(math::Float t0, math::Float t1, AABB &box) const = 0;
 

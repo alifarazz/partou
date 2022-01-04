@@ -4,8 +4,7 @@ CppApplication {
     consoleApplication: true
 
     // generated with $ fd ".*\.(hh|cc)" src | xargs -I W echo \"W\",
-    files:
-        [
+    files: [
 "src/accel/AABB.cc",
 "src/accel/AABB.hh",
 "src/camera/Camera.hh",
@@ -17,6 +16,9 @@ CppApplication {
 "src/io/obj.hh",
 "src/main.cc",
 "src/math/general.hh",
+"src/math/mat.hh",
+"src/math/transform.cc",
+"src/math/transform.hh",
 "src/math/vec.hh",
 "src/perf_stats/stats.cc",
 "src/perf_stats/stats.hh",
@@ -32,7 +34,7 @@ CppApplication {
 "src/shapes/triangle.cc",
 "src/shapes/triangle.hh",
 "src/utils/progress_bar.hh",
-        ]
+    ]
     cpp.cxxLanguageVersion: "c++20"
     cpp.cxxFlags: ["-Ofast","-funroll-loops","-march=native","-mtune=native","-flto"]
 

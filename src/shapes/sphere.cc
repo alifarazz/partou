@@ -10,13 +10,21 @@ Sphere::Sphere(const math::Point3f& center, math::Float r, Material* matp)
     , radius {r}
     , mat_ptr {matp}
 {
-  computeBB();
+  computeBoundingBox();
 }
 
-auto Sphere::computeBB() -> void
+auto Sphere::computeBoundingBox() -> void
 {
   const auto offset = decltype(this->center) {this->radius};
   this->m_aabb = accel::AABB(this->center - offset, this->center + offset);
+}
+
+auto Sphere::transformModel(const math::spatial::Transform& tModel) -> void
+{
+  center += tModel.m_translation;
+  radius *= tModel.m_scale.x;  // not using y and z beacuse this is not an ellipsis
+  // A sphere has not rotation around it's center, so tModel.m_rotation is inappropriate
+  computeBoundingBox();
 }
 
 // clang-format off
@@ -35,7 +43,6 @@ auto Sphere::computeBB() -> void
 // No answer simply means no intersection.                                                                  //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // clang-format on
-
 auto Sphere::hit(const Ray& r,
                  const math::Float t_min,
                  const math::Float t_max,

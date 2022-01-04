@@ -9,7 +9,7 @@ namespace shape
 Mesh::Mesh(const std::vector<Triangle>& tris)
     : m_tris {tris}
 {
-  this->computeBB();
+  this->computeBoundingBox();
 };
 Mesh::Mesh(const io::loader::OBJ& objLoader)
 {
@@ -44,10 +44,17 @@ Mesh::Mesh(const io::loader::OBJ& objLoader)
     }
   }
 
-  this->computeBB();
+  this->computeBoundingBox();
 }
 
-void Mesh::computeBB()
+auto Mesh::transformModel(const math::spatial::Transform& tModel) -> void
+{
+  for (auto& tri : m_tris)
+    tri.transformModel(tModel);
+  computeBoundingBox();
+}
+
+void Mesh::computeBoundingBox()
 {
   for (const auto& tri : m_tris)
     this->m_aabb.merge(tri.aabb());

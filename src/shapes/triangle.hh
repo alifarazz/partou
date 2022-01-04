@@ -24,9 +24,12 @@ public:
            Material* matp);  // fix the material raw ptr
 
   auto hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const
-      -> bool override;
+      -> bool final override;
+  auto transformModel(const math::spatial::Transform& tModel) -> void final override;
   // virtual bool bounding_box(float t0, float t1, AABB& box) const;
-  auto computeBB() -> void;
+
+  auto precomputeValues() -> void;
+  auto computeBoundingBox() -> void;
   auto interpolatedNormal(const math::Vec2f& st) const -> math::Vec3f;
 
 protected:
