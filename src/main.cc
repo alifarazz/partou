@@ -13,9 +13,9 @@
 #include "camera/PinholeCamera.hh"
 //
 #include "io/obj.hh"
+#include "io/ppm.hh"
 //
-#include "images/image.hh"
-#include "images/ppm.hh"
+#include "film/film_buffer.hh"
 //
 #include "random/random.hh"
 //
@@ -95,11 +95,12 @@ auto main(int argc, char* argv[]) -> int
   const auto lookAt = Point3f(0, 0, -1);
   const auto vUp = Vec3f(0, 1, 0);
   const auto fov = Degree(45);
-  PinholeCamera cam(lookFrom, lookAt, vUp, fov, aspect_ratio);
+  const PinholeCamera cam(lookFrom, lookAt, vUp, fov, aspect_ratio);
 
   // Transform
-  const auto lookLeft = spatial::Transform {Vec3f {0}, Vec3f {1}, Vec3f {0, PI / 6, 0}};
-  const auto lookRight = spatial::Transform {Vec3f {0}, Vec3f {1}, Vec3f {0, -PI / 6, 0}};
+  const auto lookLeft =
+      spatial::Transform {Vec3f {.12, 0, 0}, Vec3f {1.1}, Vec3f {0, PI / 6, PI / 6}};
+  // const auto lookRight = spatial::Transform {Vec3f {0}, Vec3f {1}, Vec3f {0, -PI / 6, 0}};
 
   // Scene
   const auto testSpheres = HitableList {
@@ -124,8 +125,8 @@ auto main(int argc, char* argv[]) -> int
 
   // const auto cube = shape::Mesh {io::loader::OBJ("./cube.obj")};
   const auto suzanne = shape::Mesh {io::loader::OBJ("./suzanne.obj", true)}.apply(lookLeft);
-  const auto bunny1440 =
-      shape::Mesh {io::loader::OBJ("stanford_bunny_1440.obj", true)}.apply(lookRight);
+  // const auto bunny1440 =
+  //     shape::Mesh {io::loader::OBJ("stanford_bunny_1440.obj", true)}.apply(lookRight);
   // const auto bunny2880 = shape::Mesh{io::loader::OBJ("stanford_bunny_2880.obj")};
   // const auto dragon8710 = shape::Mesh {io::loader::OBJ("stanford_dragon_8710.obj")};
 
@@ -137,7 +138,7 @@ auto main(int argc, char* argv[]) -> int
   const auto world = monkey_bunny;
 
   // Render
-  auto timeStart = Time::now();
+  const auto timeStart = Time::now();
   for (int j = int(filmbuffer.ny()) - 1; j >= 0; j--) {
     if (j % 1 << 12 == 0)  // TODO: use progress bar
       std::cerr << "\rtraceRay-> Scanlines remaining:\t\t" << j << ' ' << std::flush;
@@ -146,15 +147,10 @@ auto main(int argc, char* argv[]) -> int
       filmbuffer.pixel_color(j, i) = samplePixel(cam, world, i, j);
     }
   }
-  auto timeEnd = Time::now();
+  const auto timeEnd = Time::now();
   std::cerr << std::endl;
 
-  // for (auto i : std::ranges::iota_view{2, 8})
-  //   filmbuffer.pixel_color(i, 9) = Vec3f{1, 1, 1};
-
-  auto saver = PPMImageSaver {filmbuffer};
-  // const auto outputfilename = "./out_aabb_hitablelist.ppm";
-  // const auto outputfilename = "./out_aabb.ppm";
+  const auto saver = io::PPMImageSaver {filmbuffer};
   const auto outputfilename = argv[1];
   std::ofstream outputStream {outputfilename};
   saver.save(outputStream);
