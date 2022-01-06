@@ -1,4 +1,4 @@
-#include "PinholeCamera.hh"
+#include "pinhole_camera.hh"
 
 namespace partou
 {

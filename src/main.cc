@@ -10,7 +10,7 @@
 //
 #include "math/general.hh"
 //
-#include "camera/PinholeCamera.hh"
+#include "camera/pinhole_camera.hh"
 //
 #include "io/obj.hh"
 #include "io/ppm.hh"
