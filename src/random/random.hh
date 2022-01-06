@@ -3,35 +3,46 @@
 #include <random>
 #include <type_traits>
 
+#ifdef USE_PCG
+#include <pcg_random.hpp>
+#endif
+
 #include "../math/general.hh"
 
-namespace partou::random {
-
+namespace partou::random
+{
 // thread_local to create one differently seeded engine per thread
-inline thread_local auto engine =
-    std::mt19937(std::random_device{}());  // may throw uncatchable exception
+#ifdef USE_PCG
+// may throw uncatchable exception
+inline thread_local pcg32 engine {pcg_extras::seed_seq_from<std::random_device> {}};
+#else
+// may throw uncatchable exception
+inline thread_local auto engine = std::mt19937(std::random_device {}());
+#endif
 
-template <typename T>
-auto get(const T min, const T max) -> T {
+template<typename T>
+auto get(const T min, const T max) -> T
+{
   if constexpr (std::is_integral<T>::value) {
     return std::uniform_int_distribution(min, max)(engine);  // [min, max]
   } else {
-    return std::uniform_real_distribution(
-        min, std::nextafter(max, min))(engine);  // [min, max)
+    return std::uniform_real_distribution(min, std::nextafter(max, min))(engine);  // [min, max)
   }
 }
 
-template <typename T>
+template<typename T>
 requires std::is_floating_point_v<T>
-auto unit() -> T {
+auto unit() -> T
+{
   static thread_local std::uniform_real_distribution<T> unit_distribution(
       0.0, std::nextafter(1.0, 0.0));  // [0.0, 1.0)
   return unit_distribution(engine);
 }
 
-template <typename T>
+template<typename T>
 requires std::is_floating_point_v<T>
-auto angle() -> T {
+auto angle() -> T
+{
   {
     static thread_local std::uniform_real_distribution<T> angle_distribution(
         0.0, std::nextafter(partou::math::TWO_PI, 0.0));
@@ -64,7 +75,7 @@ auto point_in_circle() -> std::tuple<T>
   return {r * std::cos(theta), r * sin(theta)};
 #elif USE_TRIANGLE_POINT_IN_CIRCLE
   auto theta = angle<T>();
-  
+
   auto r = unit<T>() + unit<T>();
   r = r < 1 ?  r : 2 - r; // make sure it's inside the circle
   return {r * std::cos(theta), r * sin(theta)};
