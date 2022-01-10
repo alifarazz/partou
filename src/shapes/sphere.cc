@@ -5,7 +5,7 @@
 
 namespace partou
 {
-Sphere::Sphere(const math::Point3f& center, math::Float r, Material* matp)
+Sphere::Sphere(const math::Point3f& center, math::Float r, std::shared_ptr<Material> matp)
     : center {center}
     , radius {r}
     , mat_ptr {matp}
@@ -54,18 +54,7 @@ auto Sphere::hit(const Ray& r,
     info.p = r.eval_at(t);  // p is on the surface of the sphere
     auto surface_normal = ((info.p - this->center) / this->radius);  //.normalize();  // fix me!!!
     info.set_surface_normal(r, surface_normal);
-    // if (i++ == 10) {
-    //   std::cerr << "center:  " << this->center << "\n";
-    //   std::cerr << "point:   " << info.p << std::endl;
-    //   std::cerr << "radious: " << this->radius << std::endl;
-    //   std::cerr << "r.origin(): " << r.orig() << std::endl;
-    //   std::cerr << "r.dir():    " << r.dir() << std::endl;
-    //   std::cerr << "r.o - s.center:  " << r.orig() - this->center << std::endl;
-    //   std::cerr << "p - center:\t" << (this->center - info.p).length()
-    //             << std::endl;
-    //   std::cerr << "p**2:\t" << (info.p).length() << std::endl;
-    //   exit(-1);
-    // }
+    info.mat_ptr = this->mat_ptr;
   };
 
   info.mat_ptr = mat_ptr;

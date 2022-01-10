@@ -5,8 +5,9 @@
 
 #include "../math/vec.hh"
 //
+#include "../color/color.hh"
+#include "../color/gamma2.hh"
 #include "../film/film_buffer.hh"
-#include "../utils/progress_bar.hh"
 //
 #include "../utils/progress_bar.hh"  // for concepts
 
@@ -30,21 +31,20 @@ public:
     out << "P3\n" << filmbuffer.nx() << " " << filmbuffer.ny() << "\n255\n";
 
     std::size_t i {};
+    int spp = math::pow2(filmbuffer.sample_per_pixel_sqrt);
     for (const auto& pixel_color : filmbuffer.buf) {  // should've used rsv::enumerate
+      const auto c_gm2 = tonemapper::Gamma2(pixel_color, spp).sRGB();
 #ifdef CHECK_SRGB_VALUES
-      constexpr auto rgbEpsilon = 0.000001;  // Increase if `out-of-bounds` throw happens
-      if (pixel_color.x > 1. + rgbEpsilon || pixel_color.y > 1. + rgbEpsilon
-          || pixel_color.z > 1. + rgbEpsilon || pixel_color.x < -rgbEpsilon
-          || pixel_color.y < -rgbEpsilon || pixel_color.z < -rgbEpsilon)
+      constexpr auto eps = 0.000001;  // Increase if `out-of-bounds` throw happens
+      if (c_gm2.x > 1. + eps || c_gm2.y > 1. + eps || c_gm2.z > 1. + eps || c_gm2.x < -eps
+          || c_gm2.y < -eps || c_gm2.z < -eps)
       {
-        const auto mesg = make_string_error_message_out_of_bounds(i, pixel_color);
+        const auto mesg = make_string_error_message_out_of_bounds(i, c_gm2);
         throw std::invalid_argument {mesg};
       }
 #endif
-      const math::Vec3f rgb = pixel_color;
-      out << static_cast<int>(rgb_256_max_minus_eps * rgb[0]) << ' '
-          << static_cast<int>(rgb_256_max_minus_eps * rgb[1]) << ' '
-          << static_cast<int>(rgb_256_max_minus_eps * rgb[2]) << '\n';
+      sRGB8Spectrum srgb = sRGB_2_sRGB8bit(c_gm2);
+      out << srgb[0] << ' ' << srgb[1] << ' ' << srgb[2] << '\n';
       pb.tick();
       i++;
     }
@@ -56,7 +56,7 @@ public:
 protected:
   static constexpr auto rgb_256_max_minus_eps = 255.999;
 
-  auto make_string_error_message_out_of_bounds(std::size_t i, const math::Vec3f& pixel_color) const
+  auto make_string_error_message_out_of_bounds(std::size_t i, const Spectrum& pixel_color) const
   {
     using namespace std::string_literals;
     const auto yx = filmbuffer.get_yx(i);

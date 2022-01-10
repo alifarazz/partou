@@ -8,24 +8,26 @@
 namespace partou
 {
 template<typename PixelType>
-class FilmBuffer
+class FilmBuffer // TODO: rename class to Film
 {
 private:
-  std::size_t m_stride{};
+  std::size_t m_stride {};
 
 public:
+  int sample_per_pixel_sqrt;
   std::vector<PixelType> buf;
 
   // constructor
   FilmBuffer() = default;
 
-  explicit FilmBuffer(math::Vec2i ny_nx)
-      : FilmBuffer(ny_nx.y, ny_nx.x) {};
+  explicit FilmBuffer(math::Vec2i ny_nx, int spp_sqrt = 1)
+      : FilmBuffer(ny_nx.y, ny_nx.x, spp_sqrt) {};
 
-  template<typename T>
-  requires std::is_integral_v<T> FilmBuffer(T ny, T nx)
+  template<typename T, typename U>
+  requires std::is_integral_v<T> && std::is_integral_v<U> FilmBuffer(T ny, T nx, U spp_sqrt = 1)
       : m_stride {static_cast<std::size_t>(nx)}
   {
+    this->sample_per_pixel_sqrt = static_cast<int>(spp_sqrt);
     auto n_rows = static_cast<std::size_t>(ny);
     buf.resize(n_rows * m_stride);
   }

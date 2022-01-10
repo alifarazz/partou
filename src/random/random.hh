@@ -4,10 +4,11 @@
 #include <type_traits>
 
 #ifdef USE_PCG
-#include <pcg_random.hpp>
+#  include <pcg_random.hpp>
 #endif
 
 #include "../math/general.hh"
+#include "../math/vec.hh"
 
 namespace partou::random
 {
@@ -48,6 +49,26 @@ auto angle() -> T
         0.0, std::nextafter(partou::math::TWO_PI, 0.0));
     return angle_distribution(engine);
   }
+}
+
+template<typename T>
+requires std::is_floating_point_v<T>
+auto vec_in_sphere() -> math::Vec3<T>
+{  // using rejection sampling method
+  math::Vec3<T> v;
+  do {
+    v.x = unit<T>();
+    v.y = unit<T>();
+    v.z = unit<T>();
+  } while (v.length2() >= 1);
+  return v;  // Cartesian coordinates
+}
+
+template<typename T>
+requires std::is_floating_point_v<T>
+auto unit_vec3() -> math::Vec3<T>
+{
+  return vec_in_sphere<T>().normalize();  // Cartesian coordinates
 }
 
 /*

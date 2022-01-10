@@ -68,4 +68,14 @@ using Point4 = Imath::Vec4<T>;
 
 using Point3f = Point3<Float>;
 using Point3d = Point3<Double>;
+
+template<typename T>
+requires std::is_floating_point_v<T>
+inline static bool near_zero(const Vec3<T>& v)
+{  // Return true if the vector is close to zero in all dimensions.
+  constexpr auto eps = 1e-8;
+  return v.equalWithAbsError(Vec3<T>{0,0,0}, eps);
+  // bool is_zero = std::abs(v.x) < eps && std::abs(v.x) < eps && std::abs(v.x) < eps;
+  // return is_zero;
+}
 }  // namespace partou::math

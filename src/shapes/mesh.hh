@@ -3,10 +3,10 @@
 #include <cmath>
 #include <vector>
 
+#include "../material/material.hh"
+#include "../math/vec.hh"
 #include "hitable.hh"
 #include "triangle.hh"
-// #include "material.hxx"
-#include "../math/vec.hh"
 //
 #include "../io/obj.hh"
 
@@ -18,8 +18,8 @@ class Mesh : public Hitable
 {
 public:
   Mesh() = delete;
-  explicit Mesh(const std::vector<Triangle>& tris);
-  explicit Mesh(const io::loader::OBJ& objLoader);
+  explicit Mesh(const std::vector<Triangle>& tris, std::shared_ptr<Material> matp = nullptr);
+  explicit Mesh(const io::loader::OBJ& objLoader, std::shared_ptr<Material> matp = nullptr);
 
   auto apply(const math::spatial::Transform& tModel) -> Mesh&&;
   auto computeBoundingBox() -> void;
@@ -29,6 +29,7 @@ public:
   auto transformModel(const math::spatial::Transform& tModel) -> void final override;
   // virtual bool bounding_box(float t0, float t1, AABB& box) const;
 
+  std::shared_ptr<Material> m_matptr;
   std::vector<Triangle> m_tris;
 
 protected:

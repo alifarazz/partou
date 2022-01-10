@@ -10,11 +10,18 @@ CppApplication {
 "src/camera/Camera.hh",
 "src/camera/pinhole_camera.cc",
 "src/camera/pinhole_camera.hh",
+"src/color/color.hh",
+"src/color/gamma2.hh",
+"src/color/linear_gamma.hh",
 "src/film/film_buffer.hh",
 "src/io/obj.cc",
 "src/io/obj.hh",
 "src/io/ppm.hh",
 "src/main.cc",
+"src/material/lambertian.hh",
+"src/material/material.hh",
+"src/material/normal.hh",
+"src/material/utils.hh",
 "src/math/general.hh",
 "src/math/mat.hh",
 "src/math/transform.cc",
@@ -34,9 +41,10 @@ CppApplication {
 "src/shapes/triangle.cc",
 "src/shapes/triangle.hh",
 "src/utils/progress_bar.hh",
-    ]
+]
     cpp.cxxLanguageVersion: "c++20"
-    cpp.cxxFlags: ["-Ofast","-funroll-loops","-march=native","-mtune=native","-flto"]
+    cpp.cxxFlags: ["-O3","-funroll-loops","-march=native","-mtune=native","-flto=4","-fgraphite-identity",
+    "-floop-nest-optimize","-floop-parallelize-all","-DCHECK_SRGB_VALUES"]
 
     cpp.warningLevel: "all"
 

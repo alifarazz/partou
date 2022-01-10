@@ -6,12 +6,14 @@ namespace partou
 {
 namespace shape
 {
-Mesh::Mesh(const std::vector<Triangle>& tris)
-    : m_tris {tris}
+Mesh::Mesh(const std::vector<Triangle>& tris, std::shared_ptr<Material> matp)
+    : m_matptr {matp}
+    , m_tris {tris}
 {
   this->computeBoundingBox();
 };
-Mesh::Mesh(const io::loader::OBJ& objLoader)
+Mesh::Mesh(const io::loader::OBJ& objLoader, std::shared_ptr<Material> matp)
+    : m_matptr {matp}
 {
   m_tris.resize(objLoader.m_facesV.size());
   if (!objLoader.loaded_normals()) {  // don't have normals -> flat shading
@@ -80,7 +82,7 @@ auto Mesh::hit(const Ray& r, const math::Float t_min, const math::Float t_max, h
       ray_did_hit_something = true;
       closest_so_far = temp_hitinfo.t;
       info = temp_hitinfo;
-      info.i = i;
+      info.mat_ptr = m_matptr;
     }
     i++;
   }

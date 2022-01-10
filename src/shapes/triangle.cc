@@ -8,13 +8,13 @@ namespace partou
 Triangle::Triangle(const math::Vec3f& v0,
                    const math::Vec3f& v1,
                    const math::Vec3f& v2,
-                   Material* matp)
+                   std::shared_ptr<Material> matp)
     : v0 {v0}
     , v1 {v1}
     , v2 {v2}
     , mat_ptr {matp}
 {
-  this->precomputeValues(); // init E01_ and E02_
+  this->precomputeValues();  // init E01_ and E02_
   vn0 = vn1 = vn2 = E01_.cross(E02_).normalize();  // for flat shading
   this->computeBoundingBox();
 }
@@ -25,7 +25,7 @@ Triangle::Triangle(const math::Vec3f& v0,
                    const math::Vec3f& vn0,
                    const math::Vec3f& vn1,
                    const math::Vec3f& vn2,
-                   Material* matp)
+                   std::shared_ptr<Material> matp)
     : v0 {v0}
     , v1 {v1}
     , v2 {v2}
@@ -108,8 +108,10 @@ auto Triangle::hit(const Ray& r,
     return false;
 
   info.t = t;
+  info.p = r.eval_at(t);
   const auto normal = interpolatedNormal({u, v});
   info.set_surface_normal(r, normal);
+  info.mat_ptr = this->mat_ptr;
 
   partou::stats::numRayTrianglesIsect++;
 
