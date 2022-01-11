@@ -14,6 +14,7 @@ CppApplication {
 "src/color/gamma2.hh",
 "src/color/linear_gamma.hh",
 "src/film/film_buffer.hh",
+"src/integrator/uni_path_tracer.hh",
 "src/io/obj.cc",
 "src/io/obj.hh",
 "src/io/ppm.hh",
