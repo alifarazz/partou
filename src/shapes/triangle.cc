@@ -110,6 +110,7 @@ auto Triangle::hit(const Ray& r,
   info.t = t;
   info.p = r.eval_at(t);
   const auto normal = interpolatedNormal({u, v});
+  // const auto normal = E01_.cross(E02_).normalize();
   info.set_surface_normal(r, normal);
   info.mat_ptr = this->mat_ptr;
 

@@ -14,7 +14,7 @@
 
 namespace partou::integrator::uniPath
 {
-constexpr int TRACER_MAX_DEPTH = 30;
+constexpr int TRACER_MAX_DEPTH = 50;
 
 static auto traceRay(const partou::Ray& r,
                      const partou::Hitable& world,

@@ -77,8 +77,8 @@ auto Mesh::hit(const Ray& r, const math::Float t_min, const math::Float t_max, h
 
   int i {};
   math::Float tBB;
-  for (const auto& hitable : this->m_tris) {
-    if (hitable.aabb().intersect(r, tBB) && hitable.hit(r, t_min, closest_so_far, temp_hitinfo)) {
+  for (const Triangle& tri : this->m_tris) {
+    if (tri.aabb().intersect(r, tBB) && tri.hit(r, t_min, closest_so_far, temp_hitinfo)) {
       ray_did_hit_something = true;
       closest_so_far = temp_hitinfo.t;
       info = temp_hitinfo;

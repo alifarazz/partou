@@ -21,6 +21,7 @@ CppApplication {
 "src/main.cc",
 "src/material/lambertian.hh",
 "src/material/material.hh",
+"src/material/metal.hh",
 "src/material/normal.hh",
 "src/material/utils.hh",
 "src/math/general.hh",

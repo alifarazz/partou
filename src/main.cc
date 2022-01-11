@@ -23,6 +23,7 @@
 #include "shapes/triangle.hh"
 //
 #include "material/lambertian.hh"
+#include "material/metal.hh"
 //
 #include "perf_stats/stats.hh"
 
@@ -33,9 +34,9 @@ using fsec = std::chrono::duration<float>;
 
 ////// globals
 constexpr auto aspect_ratio = 4.F / 3.F;  // 16.0F / 9.0F;
-constexpr int image_width = 640;
+constexpr int image_width = 920;
 constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
-constexpr int spp_sqrt = 2;
+constexpr int spp_sqrt = 1;
 
 int main(int argc, char* argv[])
 {
@@ -54,17 +55,21 @@ int main(int argc, char* argv[])
   // const auto lookFrom = Point3f(-2, 2, 1);
   const auto lookAt = Point3f(0, 0, -1);
   const auto vUp = Vec3f(0, 1, 0);
-  const auto fov = Degree(25);
+  const auto fov = Degree(45);
   const PinholeCamera cam(lookFrom, lookAt, vUp, fov, aspect_ratio);
 
   // Transform
   const auto lookLeft =
-      spatial::Transform {Vec3f {.12, 1, 0}, Vec3f {.1}, Vec3f {0, PI / 6, PI / 6}};
+      spatial::Transform {Vec3f {.12, .1, 0}, Vec3f {1.1}, Vec3f {0, PI / 6, PI / 6}};
   // const auto lookRight = spatial::Transform {Vec3f {0}, Vec3f {1}, Vec3f {0, -PI / 6, 0}};
 
   // Material
-  const auto lambRed_p = std::make_shared<Lambertian>(sRGBSpectrum {1, 0, 0});
-  const auto lambGreen_p = std::make_shared<Lambertian>(sRGBSpectrum {0, 1, 0});
+  const auto lamb_red = std::make_shared<Lambertian>(sRGBSpectrum {1, 0, 0});
+  const auto lamb_green = std::make_shared<Lambertian>(sRGBSpectrum {0, 1, 0});
+  const auto lamb_ground = std::make_shared<Lambertian>(Spectrum(.8, .8, .0));
+  const auto lamb_center = std::make_shared<Lambertian>(Spectrum(.7, .3, .3));
+  const auto metal_left = std::make_shared<Metal>(Spectrum(.8, .8, .8), .3);
+  const auto metal_right = std::make_shared<Metal>(Spectrum(.8, .6, .2), 1);
 
   // Scene
   // const auto testSpheres = HitableList {
@@ -88,8 +93,7 @@ int main(int argc, char* argv[])
   //      }})}};
 
   // const auto cube = shape::Mesh {io::loader::OBJ("./cube.obj")};
-  const auto suzanne =
-      shape::Mesh {io::loader::OBJ("./suzanne.obj", true), lambRed_p}.apply(lookLeft);
+  auto suzanne = shape::Mesh {io::loader::OBJ("./suzanne.obj", true)}.apply(lookLeft);
   // const auto bunny1440 =
   //     shape::Mesh {io::loader::OBJ("stanford_bunny_1440.obj", true)}.apply(lookRight);
   // const auto bunny2880 = shape::Mesh{io::loader::OBJ("stanford_bunny_2880.obj")};
@@ -100,12 +104,22 @@ int main(int argc, char* argv[])
   //     std::make_shared<shape::Mesh>(bunny1440),
   // }};
 
-  const auto monkey_sphere = HitableList {{
-      // std::make_shared<shape::Mesh>(suzanne),
-      std::make_shared<Sphere>(Point3f(0.0, -100.5, -1.0), 100.0, lambRed_p),
-      std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, lambGreen_p),
+  const auto metal_lamb_scene = HitableList {{
+      std::make_shared<Sphere>(Point3f(0.0, -1000.5, -1.0), 1000.0, lamb_ground),
+      std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, lamb_center),
+      std::make_shared<Sphere>(Point3f(-1.0, 0.0, -1.0), 0.5, metal_left),
+      std::make_shared<Sphere>(Point3f(1.0, 0.0, -1.0), 0.5, metal_right),
   }};
 
+  suzanne.m_matptr = metal_left;
+  // suzanne.m_matptr = lamb_ground;
+  const auto monkey_sphere = HitableList {{
+      std::make_shared<shape::Mesh>(suzanne),
+      // std::make_shared<Sphere>(Point3f(0.0, -100.5, -1.0), 100.0, lamb_red),
+      // std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, lamb_green),
+  }};
+
+  // const auto world = metal_lamb_scene;
   const auto world = monkey_sphere;
 
   // Render
