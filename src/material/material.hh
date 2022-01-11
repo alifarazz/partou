@@ -12,7 +12,7 @@ class Material
 public:
   virtual auto scatter(const Ray& r_in,
                        const hit_info& info,
-                       Spectrum& atttenuation,
+                       Spectrum& attenuation,
                        Ray& r_scattered) const -> bool = 0;
 };
 }  // namespace partou

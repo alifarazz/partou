@@ -15,14 +15,14 @@ public:
 
   auto scatter(const Ray&,
                const hit_info& info,
-               Spectrum& atttenuation,
+               Spectrum& attenuation,
                Ray& r_scattered) const -> bool final override
   { // doesn't depend on viewing direction (which is wi (which is r_in.dir() (r_in is the first arg)))
     auto scatter_direction = info.normal + random::unit_vec3<math::Float>();
     if (math::near_zero(scatter_direction))  // degenrate scatter direction
       scatter_direction = info.normal;
     r_scattered = Ray(info.p, scatter_direction);
-    atttenuation = m_albedo;
+    attenuation = m_albedo;
     return true;
   }
 
