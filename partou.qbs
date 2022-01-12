@@ -19,6 +19,7 @@ CppApplication {
 "src/io/obj.hh",
 "src/io/ppm.hh",
 "src/main.cc",
+"src/material/dielectric.hh",
 "src/material/lambertian.hh",
 "src/material/material.hh",
 "src/material/metal.hh",

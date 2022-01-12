@@ -74,8 +74,19 @@ requires std::is_floating_point_v<T>
 inline static bool near_zero(const Vec3<T>& v)
 {  // Return true if the vector is close to zero in all dimensions.
   constexpr auto eps = 1e-8;
-  return v.equalWithAbsError(Vec3<T>{0,0,0}, eps);
+  return v.equalWithAbsError(Vec3<T> {0, 0, 0}, eps);
   // bool is_zero = std::abs(v.x) < eps && std::abs(v.x) < eps && std::abs(v.x) < eps;
   // return is_zero;
+}
+
+template<typename T>
+requires std::is_floating_point_v<T>
+inline static auto sqrt(const Vec3<T>& v) -> Vec3<T>
+{
+  return {
+      std::sqrt(v[0]),
+      std::sqrt(v[1]),
+      std::sqrt(v[2]),
+  };
 }
 }  // namespace partou::math

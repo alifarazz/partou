@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <type_traits>
 
 namespace partou::math
@@ -36,13 +37,20 @@ inline auto interpolate_linear(const T& a, const T& a_1, FloatingType t) -> T
 
 template<typename T>
 requires std::is_arithmetic_v<T>
-inline auto pow2(T a)
+inline auto pow2(const T a)
 {
   return a * a;
 }
 
 template<typename T>
-inline auto clamp(T x, T min, T max) -> T
+requires std::is_floating_point_v<T>
+inline auto sqrt(const T a) -> T
+{
+  return std::sqrt(a);
+}
+
+template<typename T>
+inline auto clamp(const T x, const T min, const T max) -> T
 {
   if (x < min)
     return min;

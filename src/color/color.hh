@@ -16,6 +16,7 @@ inline static auto sRGB_2_sRGB8bit(const sRGBSpectrum& srgb) -> sRGB8Spectrum
   constexpr Float high = 1.0 - eps;
   auto r = math::clamp(srgb[0], low, high), g = math::clamp(srgb[1], low, high),
        b = math::clamp(srgb[2], low, high);
+  // std::cout << r << '\t' << g << '\t' << b << '\n';
   return {int(r * 256), int(g * 256), int(b * 256)};
 }
 }  // namespace partou

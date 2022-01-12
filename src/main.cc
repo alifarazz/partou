@@ -22,6 +22,7 @@
 #include "shapes/sphere.hh"
 #include "shapes/triangle.hh"
 //
+#include "material/dielectric.hh"
 #include "material/lambertian.hh"
 #include "material/metal.hh"
 //
@@ -34,9 +35,9 @@ using fsec = std::chrono::duration<float>;
 
 ////// globals
 constexpr auto aspect_ratio = 4.F / 3.F;  // 16.0F / 9.0F;
-constexpr int image_width = 920;
+constexpr int image_width = 1920;
 constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
-constexpr int spp_sqrt = 1;
+constexpr int spp_sqrt = 4;
 
 int main(int argc, char* argv[])
 {
@@ -66,10 +67,13 @@ int main(int argc, char* argv[])
   // Material
   const auto lamb_red = std::make_shared<Lambertian>(sRGBSpectrum {1, 0, 0});
   const auto lamb_green = std::make_shared<Lambertian>(sRGBSpectrum {0, 1, 0});
-  const auto lamb_ground = std::make_shared<Lambertian>(Spectrum(.8, .8, .0));
-  const auto lamb_center = std::make_shared<Lambertian>(Spectrum(.7, .3, .3));
-  const auto metal_left = std::make_shared<Metal>(Spectrum(.8, .8, .8), .3);
-  const auto metal_right = std::make_shared<Metal>(Spectrum(.8, .6, .2), 1);
+  const auto lamb_ground = std::make_shared<Lambertian>(sRGBSpectrum {.8, .8, .0});
+  const auto lamb_center_blue = std::make_shared<Lambertian>(sRGBSpectrum {.1, .2, .6});
+  const auto lamb_center_egg = std::make_shared<Lambertian>(sRGBSpectrum {.7, .3, .3});
+  const auto metal_left = std::make_shared<Metal>(sRGBSpectrum {.8, .8, .8}, .3);
+  const auto metal_right = std::make_shared<Metal>(sRGBSpectrum {.8, .6, .2}, 1);
+  const auto dielec_center = std::make_shared<Dielectric>(1.5);
+  const auto dielec_left = std::make_shared<Dielectric>(1.5);
 
   // Scene
   // const auto testSpheres = HitableList {
@@ -106,16 +110,19 @@ int main(int argc, char* argv[])
 
   const auto metal_lamb_scene = HitableList {{
       std::make_shared<Sphere>(Point3f(0.0, -1000.5, -1.0), 1000.0, lamb_ground),
-      std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, lamb_center),
-      std::make_shared<Sphere>(Point3f(-1.0, 0.0, -1.0), 0.5, metal_left),
+      // std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, lamb_center),
+      // std::make_shared<Sphere>(Point3f(-1.0, 0.0, -1.0), 0.5, metal_left),
+      std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, dielec_center),
+      std::make_shared<Sphere>(Point3f(-1.0, 0.0, -1.0), 0.5, dielec_left),
       std::make_shared<Sphere>(Point3f(1.0, 0.0, -1.0), 0.5, metal_right),
   }};
 
-  suzanne.m_matptr = metal_left;
+  suzanne.m_matptr = dielec_left;
+  // suzanne.m_matptr = metal_left;
   // suzanne.m_matptr = lamb_ground;
   const auto monkey_sphere = HitableList {{
       std::make_shared<shape::Mesh>(suzanne),
-      // std::make_shared<Sphere>(Point3f(0.0, -100.5, -1.0), 100.0, lamb_red),
+      std::make_shared<Sphere>(Point3f(0.0, -100.5, -1.0), 100.0, lamb_red),
       // std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, lamb_green),
   }};
 

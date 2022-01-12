@@ -88,7 +88,7 @@ auto Triangle::hit(const Ray& r,
   // If the determinant is negative, the triangle is backfacing. We want to render these ones as
   // well, or else they'll completely disappear from the scene.
   // If the determinant is close to 0, the ray is parallel to the triangle.
-  if (det < 0 && det > -kEpsilon)
+  if (det < kEpsilon && det > -kEpsilon)
     return false;
 
   const auto inv_det = 1 / det;
