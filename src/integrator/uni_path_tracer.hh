@@ -15,34 +15,37 @@
 namespace partou::integrator::uniPath
 {
 constexpr int TRACER_MAX_DEPTH = 50;
+constexpr Spectrum background_color = sRGBSpectrum(0);
 
 static auto traceRay(const partou::Ray& r,
                      const partou::Hitable& world,
                      int depth = TRACER_MAX_DEPTH) -> Spectrum
 {  // Uni-directional path tracer
   using namespace partou;
+  constexpr math::Float eps = 1e-3;
 
-  if (depth <= 0)
+  if (depth <= 0)  // exceeded the bounce limit.
     return Spectrum {0};
 
-  constexpr math::Float eps = 1e-3;
   hit_info hinfo;
   math::Float tBB;
-  if (world.aabb().intersect(r, tBB)
-      && world.hit(r, eps, std::numeric_limits<math::Float>::max(), hinfo))
+
+  if (!(world.aabb().intersect(r, tBB)
+        && world.hit(r, eps, std::numeric_limits<math::Float>::max(), hinfo)))
   {
-    Ray r_scattered;
-    Spectrum attenuation;
-    if (hinfo.mat_ptr->scatter(r, hinfo, attenuation, r_scattered)) {
-      return attenuation * traceRay(r_scattered, world, depth - 1);
-    }
-    return Spectrum {0};
+    // color background: horizontal gradiant
+    // auto unit_dir = r.dir().normalized();
+    // auto t = (unit_dir.y + 1.0F) / 2.0F;
+    // return math::interpolate_linear(math::Vec3f(.5, .7, 1), math::Vec3f(1), t);
+    return background_color;
   }
 
-  // color background: horizontal gradiant
-  auto unit_dir = r.dir().normalized();
-  auto t = (unit_dir.y + 1.0F) / 2.0F;
-  return math::interpolate_linear(math::Vec3f(.5, .7, 1), math::Vec3f(1), t);
+  Ray r_scattered;
+  Spectrum attenuation;
+  Spectrum emitted = hinfo.mat_ptr->emitted({}, hinfo.p);  // TODO: we'll get the uv from hinfo
+  if (!hinfo.mat_ptr->scatter(r, hinfo, attenuation, r_scattered))
+    return emitted;
+  return emitted + attenuation * traceRay(r_scattered, world, depth - 1);
 }
 
 static inline auto samplePixelJittered(const PinholeCamera& cam,
@@ -76,9 +79,7 @@ static inline auto samplePixelJittered(const PinholeCamera& cam,
 }
 
 template<typename T>
-static inline auto snap(FilmBuffer<T>& fb,
-                        const PinholeCamera& cam,
-                        const Hitable& world) -> void
+static inline auto snap(FilmBuffer<T>& fb, const PinholeCamera& cam, const Hitable& world) -> void
 {
   const auto dims = math::Vec2i {int(fb.nx()), int(fb.ny())};
   for (int j = int(fb.ny()) - 1; j >= 0; j--) {

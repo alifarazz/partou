@@ -32,6 +32,7 @@ inline auto refract(const math::Vec3f& iw,
 inline auto refract(const math::Vec3f& iw, const math::Vec3f& n, const math::Float etai_over_etao)
     -> math::Vec3f
 {
+  exit(-1);
   const auto cos_theta = std::min(-iw.dot(n), math::Float(1));
   return refract(iw, n, etai_over_etao, cos_theta);
 }

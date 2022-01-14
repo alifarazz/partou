@@ -36,8 +36,9 @@ public:
       const auto c_gm2 = tonemapper::Gamma2(pixel_color, spp).sRGB();
 #ifdef CHECK_SRGB_VALUES
       if (c_gm2.x > 1 || c_gm2.y > 1 || c_gm2.z > 1 || c_gm2.x < 0 || c_gm2.y < 0 || c_gm2.z < 0) {
-        const auto mesg = make_string_error_message_out_of_bounds(i, c_gm2);
-        throw std::invalid_argument {mesg};
+        // const auto mesg = make_string_error_message_out_of_bounds(i, c_gm2);
+        // throw std::invalid_argument {mesg};
+        math::clamp(c_gm2);
       }
 #endif
       sRGB8Spectrum srgb = sRGB_2_sRGB8bit(c_gm2);

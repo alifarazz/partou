@@ -12,6 +12,7 @@ Mesh::Mesh(const std::vector<Triangle>& tris, std::shared_ptr<Material> matp)
 {
   this->computeBoundingBox();
 };
+
 Mesh::Mesh(const io::loader::OBJ& objLoader, std::shared_ptr<Material> matp)
     : m_matptr {matp}
 {
@@ -49,10 +50,10 @@ Mesh::Mesh(const io::loader::OBJ& objLoader, std::shared_ptr<Material> matp)
   this->computeBoundingBox();
 }
 
-auto Mesh::apply(const math::spatial::Transform& tModel) -> Mesh&&
+auto Mesh::apply(const math::spatial::Transform& tModel) -> Mesh&
 {
   this->transformModel(tModel);
-  return std::move(*this);
+  return *this;
 }
 
 auto Mesh::transformModel(const math::spatial::Transform& tModel) -> void

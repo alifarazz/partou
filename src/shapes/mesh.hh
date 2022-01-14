@@ -17,11 +17,15 @@ namespace shape
 class Mesh : public Hitable
 {
 public:
-  Mesh() = delete;
+  explicit Mesh() = default;
   explicit Mesh(const std::vector<Triangle>& tris, std::shared_ptr<Material> matp = nullptr);
   explicit Mesh(const io::loader::OBJ& objLoader, std::shared_ptr<Material> matp = nullptr);
+  // explicit Mesh(Mesh& m, std::shared_ptr<Material> matp = nullptr);
+  // explicit Mesh(Mesh&& m) = default;
+  // explicit Mesh(const Mesh& m) = default;
+  // explicit Mesh(Mesh& m);
 
-  auto apply(const math::spatial::Transform& tModel) -> Mesh&&;
+  auto apply(const math::spatial::Transform& tModel) -> Mesh&;
   auto computeBoundingBox() -> void;
 
   auto hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const

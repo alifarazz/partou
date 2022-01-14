@@ -81,6 +81,18 @@ inline static bool near_zero(const Vec3<T>& v)
 
 template<typename T>
 requires std::is_floating_point_v<T>
+inline static auto clamp(const Vec3<T>& v) -> Vec3<T>
+{
+  const T low = 0, high = 1;
+  return decltype(v) {
+      std::clamp(v.x, low, high),
+      std::clamp(v.y, low, high),
+      std::clamp(v.z, low, high),
+  };
+}
+
+template<typename T>
+requires std::is_floating_point_v<T>
 inline static auto sqrt(const Vec3<T>& v) -> Vec3<T>
 {
   return {

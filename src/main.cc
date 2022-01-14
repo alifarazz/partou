@@ -23,6 +23,7 @@
 #include "shapes/triangle.hh"
 //
 #include "material/dielectric.hh"
+#include "material/emissive/diffuselight.hh"
 #include "material/lambertian.hh"
 #include "material/metal.hh"
 //
@@ -34,14 +35,15 @@ using Time = std::chrono::high_resolution_clock;
 using fsec = std::chrono::duration<float>;
 
 ////// globals
-constexpr auto aspect_ratio = 4.F / 3.F;  // 16.0F / 9.0F;
-constexpr int image_width = 1920;
+constexpr auto aspect_ratio = 1.f;  // 4.F / 3.F;  // 16.0F / 9.0F;
+constexpr int image_width = 520;
 constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
-constexpr int spp_sqrt = 4;
+constexpr int spp_sqrt = 8;
 
 int main(int argc, char* argv[])
 {
   using namespace partou;
+  using namespace partou::shape;
 
   if (argc < 2) {
     std::cerr << "Bad args" << std::endl;
@@ -52,11 +54,19 @@ int main(int argc, char* argv[])
   FilmBuffer<Vec3f> filmbuffer {image_height, image_width, spp_sqrt};
 
   // Camera
-  const auto lookFrom = Point3f(0, 1, 4);  // Point3f(-2, 2, 1);
+  // const auto lookFrom = Point3f(0, 1, 4);  // Point3f(-2, 2, 1);
+  // // const auto lookFrom = Point3f(-2, 2, 1);
+  // const auto lookAt = Point3f(0, 0, -1);
+  // const auto vUp = Vec3f(0, 1, 0);
+  // const auto fov = Degree(45);
+
+  // // conrell's
+  const auto lookFrom = Point3f(0, 1, -4);  // Point3f(-2, 2, 1);
   // const auto lookFrom = Point3f(-2, 2, 1);
-  const auto lookAt = Point3f(0, 0, -1);
+  const auto lookAt = Point3f(0, 1, 1);
   const auto vUp = Vec3f(0, 1, 0);
-  const auto fov = Degree(45);
+  const auto fov = Degree(36);  // 36
+
   const PinholeCamera cam(lookFrom, lookAt, vUp, fov, aspect_ratio);
 
   // Transform
@@ -75,6 +85,10 @@ int main(int argc, char* argv[])
   const auto dielec_center = std::make_shared<Dielectric>(1.5);
   const auto dielec_left = std::make_shared<Dielectric>(1.5);
 
+  const auto red = std::make_shared<Lambertian>(sRGBSpectrum(.65, .05, .05));
+  const auto white = std::make_shared<Lambertian>(sRGBSpectrum(.73, .73, .73));
+  const auto green = std::make_shared<Lambertian>(sRGBSpectrum(.12, .45, .15));
+  const auto ceiling_light = std::make_shared<DiffuseLight>(Vec3f {5});
   // Scene
   // const auto testSpheres = HitableList {
   //     {std::make_shared<Sphere>(Point3f(0.0, -100.5, -1.0), 100.0, nullptr),
@@ -96,38 +110,75 @@ int main(int argc, char* argv[])
   //              Vec3f(1, 1, -2), Vec3f(1, -1, -2), Vec3f(-1, -1, -2), nullptr),
   //      }})}};
 
-  // const auto cube = shape::Mesh {io::loader::OBJ("./cube.obj")};
-  auto suzanne = shape::Mesh {io::loader::OBJ("./suzanne.obj", true)}.apply(lookLeft);
+  auto backwall =
+      Mesh {io::loader::OBJ("./scenes/objs/cornells box/backwall.obj")}.apply(spatial::Transform {
+          Vec3f {0, 0, 0},
+      });
+  auto ceiling = Mesh {io::loader::OBJ("./scenes/objs/cornells box/ceiling.obj")};
+  auto floor = Mesh {io::loader::OBJ("./scenes/objs/cornells box/floor.obj")};
+  auto rightwall = Mesh {io::loader::OBJ("./scenes/objs/cornells box/rightwall.obj")};
+  auto leftwall = Mesh {io::loader::OBJ("./scenes/objs/cornells box/leftwall.obj")};
+  auto light = ceiling;
+  light = light.apply(spatial::Transform {Vec3f {0, 1.39, 0}, Vec3f {.3}, Vec3f {0}});
+
+  auto cube = Mesh {io::loader::OBJ("./cube.obj")};
+  auto cube2 = cube;  // Mesh {io::loader::OBJ("./cube.obj")};
+  cube = cube.apply(spatial::Transform(Vec3f {-.4, .25, -.6}, Vec3f {.25}, Vec3f {0, -PI / 18, 0}));
+  cube2 =
+      cube2.apply(spatial::Transform(Vec3f {.4, .5, -0}, Vec3f {.3, .5, .3}, Vec3f {0, PI / 18, 0}));
+  // auto suzanne = Mesh {io::loader::OBJ("./suzanne.obj", true)}.apply(lookLeft);
   // const auto bunny1440 =
-  //     shape::Mesh {io::loader::OBJ("stanford_bunny_1440.obj", true)}.apply(lookRight);
-  // const auto bunny2880 = shape::Mesh{io::loader::OBJ("stanford_bunny_2880.obj")};
-  // const auto dragon8710 = shape::Mesh {io::loader::OBJ("stanford_dragon_8710.obj")};
+  //     Mesh {io::loader::OBJ("stanford_bunny_1440.obj", true)}.apply(lookRight);
+  // const auto bunny2880 = Mesh{io::loader::OBJ("stanford_bunny_2880.obj")};
+  // const auto dragon8710 = Mesh {io::loader::OBJ("stanford_dragon_8710.obj")};
 
   // const auto monkey_bunny = HitableList {{
-  //     std::make_shared<shape::Mesh>(suzanne),
-  //     std::make_shared<shape::Mesh>(bunny1440),
+  //     std::make_shared<Mesh>(suzanne),
+  //     std::make_shared<Mesh>(bunny1440),
   // }};
 
   const auto metal_lamb_scene = HitableList {{
       std::make_shared<Sphere>(Point3f(0.0, -1000.5, -1.0), 1000.0, lamb_ground),
-      // std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, lamb_center),
+      std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, lamb_center_blue),
       // std::make_shared<Sphere>(Point3f(-1.0, 0.0, -1.0), 0.5, metal_left),
-      std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, dielec_center),
+      // std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, dielec_center),
       std::make_shared<Sphere>(Point3f(-1.0, 0.0, -1.0), 0.5, dielec_left),
       std::make_shared<Sphere>(Point3f(1.0, 0.0, -1.0), 0.5, metal_right),
   }};
 
-  suzanne.m_matptr = dielec_left;
+  cube.m_matptr = white;
+  cube2.m_matptr = white;
+  backwall.m_matptr = white;
+  ceiling.m_matptr = white;
+  floor.m_matptr = white;
+  rightwall.m_matptr = red;
+  leftwall.m_matptr = green;
+  // light.m_matptr = lamb_center_blue;
+  light.m_matptr = ceiling_light;
+  const auto balls_with_light_scene = HitableList {{
+      std::make_shared<Mesh>(backwall),
+      std::make_shared<Mesh>(ceiling),
+      std::make_shared<Mesh>(light),
+      std::make_shared<Mesh>(floor),
+      std::make_shared<Mesh>(rightwall),
+      std::make_shared<Mesh>(leftwall),
+      std::make_shared<Mesh>(cube),
+      std::make_shared<Mesh>(cube2),
+  }};
+
+  // suzanne.m_matptr = dielec_left;
   // suzanne.m_matptr = metal_left;
   // suzanne.m_matptr = lamb_ground;
   const auto monkey_sphere = HitableList {{
-      std::make_shared<shape::Mesh>(suzanne),
+      // std::make_shared<Mesh>(suzanne),
+      std::make_shared<Mesh>(light),
       std::make_shared<Sphere>(Point3f(0.0, -100.5, -1.0), 100.0, lamb_red),
-      // std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, lamb_green),
+      std::make_shared<Sphere>(Point3f(0.0, 0.0, -1.0), 0.5, lamb_green),
   }};
 
-  // const auto world = metal_lamb_scene;
-  const auto world = monkey_sphere;
+  //   const auto world = metal_lamb_scene;
+  // const auto world = monkey_sphere;
+  const auto world = balls_with_light_scene;
 
   // Render
   const auto timeStart = Time::now();

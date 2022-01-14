@@ -66,6 +66,14 @@ auto vec_in_sphere() -> math::Vec3<T>
 
 template<typename T>
 requires std::is_floating_point_v<T>
+auto vec_in_hemisphere(const math::Vec3<T>& normal) -> math::Vec3<T>
+{
+  const auto in_unit_sphere = vec_in_sphere<T>();
+  return in_unit_sphere.dot(normal) > 0 ? in_unit_sphere : -in_unit_sphere;
+}
+
+template<typename T>
+requires std::is_floating_point_v<T>
 auto unit_vec3() -> math::Vec3<T>
 {
   return vec_in_sphere<T>().normalize();  // Cartesian coordinates
