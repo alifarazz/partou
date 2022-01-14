@@ -57,9 +57,9 @@ auto vec_in_sphere() -> math::Vec3<T>
 {  // using rejection sampling method
   math::Vec3<T> v;
   do {
-    v.x = unit<T>();
-    v.y = unit<T>();
-    v.z = unit<T>();
+    v[0] = get<T>(-1, 1);
+    v[1] = get<T>(-1, 1);
+    v[2] = get<T>(-1, 1);
   } while (v.length2() >= 1);
   return v;  // Cartesian coordinates
 }
