@@ -19,9 +19,12 @@ public:
     return false;
   }
 
-  auto emitted(const math::Vec2f&, const math::Point3f&) const -> Spectrum final override
-  {  // uv, p
-    return m_albedo;
+  auto emitted(const math::Vec2f&, const hit_info& hinfo, const math::Point3f&) const
+      -> Spectrum final override
+  {  // uv, hinfo, p
+    if (hinfo.is_front_facing)
+      return m_albedo;
+    return Spectrum {0};
   }
 
   Spectrum m_albedo;

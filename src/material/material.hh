@@ -25,8 +25,8 @@ public:
     return 0;
   }
 
-  virtual auto emitted(const math::Vec2f&, const math::Point3f&) const -> Spectrum
-  {  // uv, p
+  virtual auto emitted(const math::Vec2f&, const hit_info&, const math::Point3f&) const -> Spectrum
+  {  // uv, hinfo, p
     return Spectrum {0};
   }
 };

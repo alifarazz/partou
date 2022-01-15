@@ -44,7 +44,7 @@ static auto traceRay(const partou::Ray& r,
 
   Ray r_scattered;
   Spectrum albedo;
-  Spectrum emitted = hinfo.mat_ptr->emitted({}, hinfo.p);  // TODO: we'll get the uv from hinfo
+  Spectrum emitted = hinfo.mat_ptr->emitted({}, hinfo, hinfo.p);  // TODO: we'll get the uv from hinfo
   Float pdf;
 
   if (!hinfo.mat_ptr->scatter(r, hinfo, albedo, r_scattered, pdf))
