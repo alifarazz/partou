@@ -9,21 +9,6 @@ namespace partou
 class Lambertian : public Material
 {
 public:
-  static inline math::Vec3f random_cosine_direction()
-  {
-    using namespace partou::random;
-    using namespace partou::math;
-
-    const auto r1 = unit<Float>(), r2 = unit<Float>();
-    const auto z = std::sqrt(1 - r2);
-
-    const auto phi = 2 * PI * r1;
-    const auto x = std::cos(phi) * std::sqrt(r2);
-    const auto y = std::sin(phi) * std::sqrt(r2);
-
-    return {x, y, z};
-  }
-
   Lambertian(const Spectrum& albedo)
       : m_albedo {albedo}
   {
@@ -37,7 +22,7 @@ public:
   {  // doesn't depend on viewing direction (which is wi (which is r_in.dir() (r_in is the first
      // arg)))
     const math::spatial::ONB onb {info.normal};
-    const auto scatter_direction = onb.local(this->random_cosine_direction());
+    const auto scatter_direction = onb.local(random::cosine_direction<math::Float>());
     r_scattered = Ray(info.p, scatter_direction.normalized());
     albedo = m_albedo;
     pdf = onb.n.dot(r_scattered.dir().normalized()) / math::PI;

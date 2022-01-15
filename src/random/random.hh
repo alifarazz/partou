@@ -53,7 +53,7 @@ auto angle() -> T
 
 template<typename T>
 requires std::is_floating_point_v<T>
-auto vec_in_sphere() -> math::Vec3<T>
+inline auto vec_in_sphere() -> math::Vec3<T>
 {  // using rejection sampling method
   math::Vec3<T> v;
   do {
@@ -66,7 +66,7 @@ auto vec_in_sphere() -> math::Vec3<T>
 
 template<typename T>
 requires std::is_floating_point_v<T>
-auto vec_in_hemisphere(const math::Vec3<T>& normal) -> math::Vec3<T>
+inline auto vec_in_hemisphere(const math::Vec3<T>& normal) -> math::Vec3<T>
 {
   const auto in_unit_sphere = vec_in_sphere<T>();
   return in_unit_sphere.dot(normal) > 0 ? in_unit_sphere : -in_unit_sphere;
@@ -74,9 +74,26 @@ auto vec_in_hemisphere(const math::Vec3<T>& normal) -> math::Vec3<T>
 
 template<typename T>
 requires std::is_floating_point_v<T>
-auto unit_vec3() -> math::Vec3<T>
+inline auto unit_vec3() -> math::Vec3<T>
 {
   return vec_in_sphere<T>().normalize();  // Cartesian coordinates
+}
+
+template<typename T>
+requires std::is_floating_point_v<T>
+static inline auto cosine_direction() -> math::Vec3<T>
+{
+  using namespace partou::random;
+  using namespace partou::math;
+
+  const auto r1 = unit<Float>(), r2 = unit<Float>();
+  const auto z = std::sqrt(1 - r2);
+
+  const auto phi = 2 * PI * r1;
+  const auto x = std::cos(phi) * std::sqrt(r2);
+  const auto y = std::sin(phi) * std::sqrt(r2);
+
+  return {x, y, z};
 }
 
 /*

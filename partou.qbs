@@ -37,6 +37,7 @@ CppApplication {
 "src/perf_stats/stats.hh",
 "src/random/random.hh",
 "src/ray/ray.hh",
+"src/sampling/pdf.hh",
 "src/shapes/hitable.hh",
 "src/shapes/hitable_list.cc",
 "src/shapes/hitable_list.hh",

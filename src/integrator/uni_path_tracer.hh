@@ -8,6 +8,7 @@
 #include "../material/material.hh"
 #include "../math/general.hh"
 #include "../random/random.hh"
+#include "../sampling/pdf.hh"
 #include "../shapes/hitable.hh"
 //
 #include "../perf_stats/stats.hh"
@@ -44,15 +45,19 @@ static auto traceRay(const partou::Ray& r,
 
   Ray r_scattered;
   Spectrum albedo;
-  Spectrum emitted = hinfo.mat_ptr->emitted({}, hinfo, hinfo.p);  // TODO: we'll get the uv from hinfo
-  Float pdf;
+  Spectrum emitted = hinfo.mat_ptr->emitted({}, hinfo, hinfo.p);
+  Float pdf_val;
 
-  if (!hinfo.mat_ptr->scatter(r, hinfo, albedo, r_scattered, pdf))
+  if (!hinfo.mat_ptr->scatter(r, hinfo, albedo, r_scattered, pdf_val))
     return emitted;
 
-  return emitted  //
-       + albedo * hinfo.mat_ptr->scattering_pdf(r, hinfo, r_scattered)
-             * traceRay(r_scattered, world, depth - 1) / pdf;
+  sampling::CosinePDF cospdf {hinfo.normal};
+  r_scattered = Ray(hinfo.p, cospdf.generate());
+  pdf_val = cospdf.value(r_scattered.dir());
+
+  albedo *= hinfo.mat_ptr->scattering_pdf(r, hinfo, r_scattered);
+  albedo *= traceRay(r_scattered, world, depth - 1) / pdf_val;
+  return emitted + albedo;
 }
 
 static inline auto samplePixelJittered(const PinholeCamera& cam,
