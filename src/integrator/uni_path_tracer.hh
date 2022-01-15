@@ -22,16 +22,18 @@ static auto traceRay(const partou::Ray& r,
                      int depth = TRACER_MAX_DEPTH) -> Spectrum
 {  // Uni-directional path tracer
   using namespace partou;
+  using namespace partou::math;
+
   constexpr math::Float eps = 1e-3;
 
   if (depth <= 0)  // exceeded the bounce limit.
     return Spectrum {0};
 
   hit_info hinfo;
-  math::Float tBB;
+  Float tBB;
 
   if (!(world.aabb().intersect(r, tBB)
-        && world.hit(r, eps, std::numeric_limits<math::Float>::max(), hinfo)))
+        && world.hit(r, eps, std::numeric_limits<Float>::max(), hinfo)))
   {
     // color background: horizontal gradiant
     // auto unit_dir = r.dir().normalized();
@@ -41,11 +43,16 @@ static auto traceRay(const partou::Ray& r,
   }
 
   Ray r_scattered;
-  Spectrum attenuation;
+  Spectrum albedo;
   Spectrum emitted = hinfo.mat_ptr->emitted({}, hinfo.p);  // TODO: we'll get the uv from hinfo
-  if (!hinfo.mat_ptr->scatter(r, hinfo, attenuation, r_scattered))
+  Float pdf;
+
+  if (!hinfo.mat_ptr->scatter(r, hinfo, albedo, r_scattered, pdf))
     return emitted;
-  return emitted + attenuation * traceRay(r_scattered, world, depth - 1);
+
+  return emitted  //
+       + albedo * hinfo.mat_ptr->scattering_pdf(r, hinfo, r_scattered)
+             * traceRay(r_scattered, world, depth - 1) / pdf;
 }
 
 static inline auto samplePixelJittered(const PinholeCamera& cam,

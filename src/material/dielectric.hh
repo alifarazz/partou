@@ -16,13 +16,16 @@ public:
   {
   }
 
-  auto scatter(const Ray& r_in, const hit_info& info, Spectrum& attenuation, Ray& r_scattered) const
-      -> bool final override
+  auto scatter(const Ray& r_in,
+               const hit_info& info,
+               Spectrum& albedo,
+               Ray& r_scattered,
+               math::Float& pdf) const -> bool final override
   {
     using namespace partou::math;
     using namespace partou::utils;
 
-    attenuation = Spectrum {1};
+    albedo = Spectrum {1};
 
     const auto refraction_ratio = info.is_front_facing ? (Float(1) / ior) : ior;
 

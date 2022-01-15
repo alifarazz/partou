@@ -17,12 +17,15 @@ public:
   {
   }
 
-  auto scatter(const Ray& r_in, const hit_info& info, Spectrum& attenuation, Ray& r_scattered) const
-      -> bool final override
+  auto scatter(const Ray& r_in,
+               const hit_info& info,
+               Spectrum& albedo,
+               Ray& r_scattered,
+               math::Float& pdf) const -> bool final override
   {
     const auto reflected = utils::reflect(r_in.dir().normalized(), info.normal);
     r_scattered = Ray(info.p, reflected + m_fuzz * random::vec_in_sphere<math::Float>());
-    attenuation = m_albedo;
+    albedo = m_albedo;
     return r_scattered.dir().dot(info.normal) > 0;
   }
 

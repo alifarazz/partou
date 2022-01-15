@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
   const auto red = std::make_shared<Lambertian>(sRGBSpectrum(.65, .05, .05));
   const auto white = std::make_shared<Lambertian>(sRGBSpectrum(.73, .73, .73));
   const auto green = std::make_shared<Lambertian>(sRGBSpectrum(.12, .45, .15));
-  const auto ceiling_light = std::make_shared<DiffuseLight>(Vec3f {5});
+  const auto ceiling_light = std::make_shared<DiffuseLight>(Vec3f {8});
   // Scene
   // const auto testSpheres = HitableList {
   //     {std::make_shared<Sphere>(Point3f(0.0, -100.5, -1.0), 100.0, nullptr),
@@ -110,10 +110,7 @@ int main(int argc, char* argv[])
   //              Vec3f(1, 1, -2), Vec3f(1, -1, -2), Vec3f(-1, -1, -2), nullptr),
   //      }})}};
 
-  auto backwall =
-      Mesh {io::loader::OBJ("./scenes/objs/cornells box/backwall.obj")}.apply(spatial::Transform {
-          Vec3f {0, 0, 0},
-      });
+  auto backwall = Mesh {io::loader::OBJ("./scenes/objs/cornells box/backwall.obj")};
   auto ceiling = Mesh {io::loader::OBJ("./scenes/objs/cornells box/ceiling.obj")};
   auto floor = Mesh {io::loader::OBJ("./scenes/objs/cornells box/floor.obj")};
   auto rightwall = Mesh {io::loader::OBJ("./scenes/objs/cornells box/rightwall.obj")};
@@ -124,8 +121,8 @@ int main(int argc, char* argv[])
   auto cube = Mesh {io::loader::OBJ("./cube.obj")};
   auto cube2 = cube;  // Mesh {io::loader::OBJ("./cube.obj")};
   cube = cube.apply(spatial::Transform(Vec3f {-.4, .25, -.6}, Vec3f {.25}, Vec3f {0, -PI / 18, 0}));
-  cube2 =
-      cube2.apply(spatial::Transform(Vec3f {.4, .5, -0}, Vec3f {.3, .5, .3}, Vec3f {0, PI / 18, 0}));
+  cube2 = cube2.apply(
+      spatial::Transform(Vec3f {.4, .5, -0}, Vec3f {.3, .5, .3}, Vec3f {0, PI / 18, 0}));
   // auto suzanne = Mesh {io::loader::OBJ("./suzanne.obj", true)}.apply(lookLeft);
   // const auto bunny1440 =
   //     Mesh {io::loader::OBJ("stanford_bunny_1440.obj", true)}.apply(lookRight);
