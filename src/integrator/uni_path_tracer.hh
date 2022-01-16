@@ -11,6 +11,8 @@
 #include "../sampling/pdf.hh"
 #include "../shapes/hitable.hh"
 //
+#include "../shapes/mesh.hh"
+//
 #include "../perf_stats/stats.hh"
 
 namespace partou::integrator::uniPath
@@ -20,6 +22,7 @@ constexpr Spectrum background_color = sRGBSpectrum(0);
 
 static auto traceRay(const partou::Ray& r,
                      const partou::Hitable& world,
+                     std::shared_ptr<const Hitable>& lights,
                      int depth = TRACER_MAX_DEPTH) -> Spectrum
 {  // Uni-directional path tracer
   using namespace partou;
@@ -51,17 +54,21 @@ static auto traceRay(const partou::Ray& r,
   if (!hinfo.mat_ptr->scatter(r, hinfo, albedo, r_scattered, pdf_val))
     return emitted;
 
-  sampling::CosinePDF cospdf {hinfo.normal};
-  r_scattered = Ray(hinfo.p, cospdf.generate());
-  pdf_val = cospdf.value(r_scattered.dir());
+  // sampling::CosinePDF cospdf {hinfo.normal};
+  // r_scattered = Ray(hinfo.p, cospdf.generate());
+  // pdf_val = cospdf.value(r_scattered.dir());
+  const sampling::HitablePDF light_pdf(lights, hinfo.p);
+  r_scattered = Ray(hinfo.p, light_pdf.generate());
+  pdf_val = light_pdf.value(r_scattered.dir());
 
   albedo *= hinfo.mat_ptr->scattering_pdf(r, hinfo, r_scattered);
-  albedo *= traceRay(r_scattered, world, depth - 1) / pdf_val;
+  albedo *= traceRay(r_scattered, world, lights, depth - 1) / pdf_val;
   return emitted + albedo;
 }
 
 static inline auto samplePixelJittered(const PinholeCamera& cam,
                                        const Hitable& world,
+                                       std::shared_ptr<const Hitable>& lights,
                                        const math::Vec2i& xy,
                                        const math::Vec2i& iWH,
                                        const int& spp_sqrt) -> math::Vec3f
@@ -83,7 +90,7 @@ static inline auto samplePixelJittered(const PinholeCamera& cam,
 
       auto r = cam.make_ray(uv[0], 1 - uv[1]);  // flip v because ppm-saver is upside down :(
       partou::stats::numPrimaryRays++;
-      color += traceRay(r, world);
+      color += traceRay(r, world, lights);
       // std::cerr << fmt::format("{}, {} = {}", j, i, color.x) << std::endl;
     }
   }
@@ -91,7 +98,10 @@ static inline auto samplePixelJittered(const PinholeCamera& cam,
 }
 
 template<typename T>
-static inline auto snap(FilmBuffer<T>& fb, const PinholeCamera& cam, const Hitable& world) -> void
+static inline auto snap(FilmBuffer<T>& fb,
+                        const PinholeCamera& cam,
+                        const Hitable& world,
+                        std::shared_ptr<const Hitable>& lights) -> void
 {
   const auto dims = math::Vec2i {int(fb.nx()), int(fb.ny())};
   for (int j = int(fb.ny()) - 1; j >= 0; j--) {
@@ -100,7 +110,7 @@ static inline auto snap(FilmBuffer<T>& fb, const PinholeCamera& cam, const Hitab
 
     for (int i = 0; i < int(fb.nx()); i++) {
       fb.pixel_color(j, i) =
-          samplePixelJittered(cam, world, {i, j}, dims, fb.sample_per_pixel_sqrt);
+          samplePixelJittered(cam, world, lights, {i, j}, dims, fb.sample_per_pixel_sqrt);
     }
   }
 }

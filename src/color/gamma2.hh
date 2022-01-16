@@ -2,6 +2,8 @@
 
 #include "../math/general.hh"
 #include "color.hh"
+//
+#include "../perf_stats/stats.hh"
 
 namespace partou::tonemapper
 {
@@ -18,10 +20,20 @@ public:
   {
     auto r = std::sqrt(m_scale * m_spectrum[0]), g = std::sqrt(m_scale * m_spectrum[1]),
          b = std::sqrt(m_scale * m_spectrum[2]);
-    const auto fix_nan = [](const auto f) { return f == f ? f : 0; };  // zero out nan values
+    auto has_nan = false;
+    const auto fix_nan = [&has_nan](const auto f)
+    {
+      if (f == f)
+        return f;
+      has_nan = true;
+      return decltype(f)(0);
+    };  // zero out nan values
     r = fix_nan(r);
     g = fix_nan(g);
     b = fix_nan(b);
+
+    stats::numNaNpixels += has_nan;
+
     return {math::clamp(math::Vec3f {r, g, b})};
   }
 

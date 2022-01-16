@@ -10,9 +10,7 @@
 //
 #include "../io/obj.hh"
 
-namespace partou
-{
-namespace shape
+namespace partou::shape
 {
 class Mesh : public Hitable
 {
@@ -31,12 +29,13 @@ public:
   auto hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const
       -> bool final override;
   auto transformModel(const math::spatial::Transform& tModel) -> void final override;
-  // virtual bool bounding_box(float t0, float t1, AABB& box) const;
+  auto pdf_value(const math::Point3f& origin, const math::Vec3f& dir) const
+      -> math::Float final override;
+  auto random(const math::Point3f& origin) const -> math::Vec3f final override;
 
   std::shared_ptr<Material> m_matptr;
   std::vector<Triangle> m_tris;
 
 protected:
 };
-}  // namespace shape
-}  // namespace partou
+}  // namespace partou::shape

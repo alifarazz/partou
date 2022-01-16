@@ -10,17 +10,12 @@ struct hit_info;
 class Material
 {
 public:
-  virtual auto scatter(const Ray& r_in,
-                       const hit_info& info,
-                       Spectrum& attenuation,
-                       Ray& r_scattered,
-                       math::Float& pdf) const -> bool
+  virtual auto scatter(const Ray&, const hit_info&, Spectrum&, Ray&, math::Float&) const -> bool
   {
     return false;
   }
 
-  virtual auto scattering_pdf(const Ray& r_in, const hit_info& hinfo, const Ray& scattered) const
-      -> math::Float
+  virtual auto scattering_pdf(const Ray&, const hit_info&, const Ray&) const -> math::Float
   {
     return 0;
   }

@@ -1,5 +1,7 @@
 #include "triangle.hh"
 
+#include "../random/random.hh"
+//
 #include "../perf_stats/stats.hh"
 
 namespace partou
@@ -42,6 +44,7 @@ auto Triangle::precomputeValues() -> void
 {
   E01_ = v1 - v0;
   E02_ = v2 - v0;
+  area_ = E01_.cross(E02_).length() / math::Float(2);
 }
 
 auto Triangle::computeBoundingBox() -> void
@@ -69,6 +72,32 @@ auto Triangle::transformModel(const math::spatial::Transform& tModel) -> void  /
 
   this->precomputeValues();
   this->computeBoundingBox();
+}
+
+auto Triangle::pdf_value(const math::Point3f& origin, const math::Vec3f& dir) const -> math::Float
+{
+  constexpr auto eps = 1e-3;
+
+  hit_info hinfo;
+  if (!this->hit(Ray(origin, dir), eps, std::numeric_limits<math::Float>::max(), hinfo))
+    return 0;
+
+  const auto distance2 = math::pow2(hinfo.t) * dir.length2();
+  const auto cosine = std::abs(dir.dot(hinfo.normal) / dir.length());
+
+  return distance2 / (cosine * area_);
+}
+
+auto Triangle::random(const math::Point3f& origin) const -> math::Vec3f
+{  // uniform point inside tri, from:
+   // https://stackoverflow.com/questions/68493050/sample-uniformly-random-points-within-a-triangle
+  using namespace partou::math;
+
+  const auto s = random::unit<Float>(), t = random::unit<Float>();
+  const auto is_inside_tri = s + t <= 1;
+  const auto point =
+      this->v0 + ((is_inside_tri) ? s * E01_ + t * E02_ : (1 - s) * E01_ + (1 - t) * E02_);
+  return point - origin;
 }
 
 // from:

@@ -26,14 +26,17 @@ public:
   auto hit(const Ray& r, const math::Float t_min, const math::Float t_max, hit_info& info) const
       -> bool final override;
   auto transformModel(const math::spatial::Transform& tModel) -> void final override;
-  // virtual bool bounding_box(float t0, float t1, AABB& box) const;
+  auto pdf_value(const math::Point3f& origin, const math::Vec3f& dir) const
+      -> math::Float final override;
+  auto random(const math::Point3f& origin) const -> math::Vec3f final override;
 
   auto precomputeValues() -> void;
   auto computeBoundingBox() -> void;
   auto interpolatedNormal(const math::Vec2f& st) const -> math::Vec3f;
 
-protected:
+// protected:
   // underscore at the end of the name means it'll be precomputed (for example, in the constructor)
+  math::Float area_;
   math::Vec3f v0, v1, v2;
   math::Vec3f E01_, E02_;  // precomputed barycentric axis
   // math::Vec3f normal_;  // precomputed normal of the plane in which the triangle resides

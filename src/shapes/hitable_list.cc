@@ -1,10 +1,10 @@
 #include "hitable_list.hh"
 
 #include "../accel/AABB.hh"
+#include "../random/random.hh"
 
 namespace partou
 {
-
 HitableList::HitableList(std::vector<std::shared_ptr<const Hitable>> hitable_vector)
     : m_hitables {std::move(hitable_vector)}
 {
@@ -53,24 +53,18 @@ auto HitableList::end()
   return m_hitables.end();
 }
 
-// bool HitableList::bounding_box(math::Float t0, math::Float t1, AABB& box) const
-// {
-//   if (count < 1)
-//     return false;
-
-//   AABB tmp_box;
-
-//   bool hitable1_true {list[0]->bounding_box(t0, t1, tmp_box)};
-//   if (!hitable1_true)
-//     return false;
-//   else
-//     box = tmp_box;
-
-//   for (int i = 1; i < count; i++)
-//     if (list[i]->bounding_box(t0, t1, tmp_box))
-//       box = surrounding_box(box, tmp_box);
-//     else
-//       return false;
-//   return true;
-// }
+auto HitableList::pdf_value(const math::Point3f& origin, const math::Vec3f& dir) const
+    -> math::Float
+{
+  const auto weight = math::Float(1) / m_hitables.size();
+  math::Float sum = 0;
+  for (const auto& tri : m_hitables)
+    sum += weight * tri->pdf_value(origin, dir);
+  return sum;
+}
+auto HitableList::random(const math::Point3f& origin) const -> math::Vec3f
+{  // HACK: again, idk, return whatever
+  const auto sz = static_cast<int>(m_hitables.size());
+  return m_hitables[random::get(0, sz - 1)]->random(origin);
+}
 }  // namespace partou

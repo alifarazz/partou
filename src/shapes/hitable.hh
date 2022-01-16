@@ -21,7 +21,7 @@ struct hit_info
   bool is_front_facing;  // whether the ray is inside the object, or on the
                          // surface and outside of it
   math::Float t;
-  std::shared_ptr<Material> mat_ptr; /// fix me pls, I can be both a const and a ref(?)
+  std::shared_ptr<Material> mat_ptr;  /// fix me pls, I can be both a const and a ref(?)
   math::Vec3f p;
   math::Vec3f normal;
 
@@ -45,7 +45,19 @@ public:
                    const math::Float t_min,
                    const math::Float t_max,
                    hit_info& info) const -> bool = 0;
+
   virtual auto transformModel(const math::spatial::Transform& tModel) -> void = 0;
+
+  virtual auto pdf_value(const math::Point3f&, const math::Vec3f&) const -> math::Float
+  {  // origin, dir
+    exit(-2);
+    return 0;
+  }
+  virtual auto random(const math::Point3f&) const -> math::Vec3f
+  {  // origin
+    exit(-2);
+    return {1, 0, 0};
+  }
 
 protected:
   Hitable() = default;

@@ -2,9 +2,9 @@
 
 #include "mesh.hh"
 
-namespace partou
-{
-namespace shape
+#include "../random/random.hh"
+
+namespace partou::shape
 {
 Mesh::Mesh(const std::vector<Triangle>& tris, std::shared_ptr<Material> matp)
     : m_matptr {matp}
@@ -90,5 +90,19 @@ auto Mesh::hit(const Ray& r, const math::Float t_min, const math::Float t_max, h
 
   return ray_did_hit_something;
 }
-}  // namespace shape
-}  // namespace partou
+
+auto Mesh::pdf_value(const math::Point3f& origin, const math::Vec3f& dir) const -> math::Float
+{
+  const auto weight = math::Float(1) / m_tris.size();
+  math::Float sum = 0;
+  for (const auto& tri : m_tris)
+    sum += weight * tri.pdf_value(origin, dir);
+  return sum;
+}
+
+auto Mesh::random(const math::Point3f& origin) const -> math::Vec3f
+{  // HACK: idk, return whatever
+  const auto sz = static_cast<int>(m_tris.size());
+  return m_tris[random::get(0, sz - 1)].random(origin);
+}
+}  // namespace partou::shape

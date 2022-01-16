@@ -38,7 +38,7 @@ using fsec = std::chrono::duration<float>;
 constexpr auto aspect_ratio = 1.f;  // 4.F / 3.F;  // 16.0F / 9.0F;
 constexpr int image_width = 520;
 constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
-constexpr int spp_sqrt = 8;
+constexpr int spp_sqrt = 8;  // was 8
 
 int main(int argc, char* argv[])
 {
@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
   leftwall.m_matptr = green;
   // light.m_matptr = lamb_center_blue;
   light.m_matptr = ceiling_light;
-  const auto balls_with_light_scene = HitableList {{
+  const auto cornells_box = HitableList {{
       std::make_shared<Mesh>(backwall),
       std::make_shared<Mesh>(ceiling),
       std::make_shared<Mesh>(light),
@@ -162,6 +162,7 @@ int main(int argc, char* argv[])
       std::make_shared<Mesh>(cube),
       std::make_shared<Mesh>(cube2),
   }};
+  std::shared_ptr<const Hitable> cornells_box_lights = std::make_shared<const Mesh>(light);
 
   // suzanne.m_matptr = dielec_left;
   // suzanne.m_matptr = metal_left;
@@ -175,11 +176,12 @@ int main(int argc, char* argv[])
 
   //   const auto world = metal_lamb_scene;
   // const auto world = monkey_sphere;
-  const auto world = balls_with_light_scene;
+  const auto world = cornells_box;
+  auto lights = cornells_box_lights;
 
   // Render
   const auto timeStart = Time::now();
-  integrator::uniPath::snap(filmbuffer, cam, world);
+  integrator::uniPath::snap(filmbuffer, cam, world, lights);
   const auto timeEnd = Time::now();
   std::cerr << std::endl;
 
@@ -205,7 +207,10 @@ int main(int argc, char* argv[])
   std::cout << "Total number of ray-triangles intersections : "
             << stats::numRayTrianglesIsect.load() << std::endl;
   std::cout << "Ray-triangles tests/intersects              : "
-            << static_cast<float>(partou::stats::numRayTrianglesIsect.load())
+            << Float(partou::stats::numRayTrianglesIsect.load())
                    / partou::stats::numRayTrianglesTests.load() * 100
             << "%" << std::endl;
+  std::cout << "Total number of NaN pixels                  : " << stats::numNaNpixels << " ("
+            << Float(stats::numNaNpixels.load()) / filmbuffer.nx() * filmbuffer.ny() * 100 << "%)"
+            << std::endl;
 }
