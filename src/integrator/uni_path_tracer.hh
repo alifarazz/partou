@@ -30,14 +30,14 @@ static auto traceRay(const partou::Ray& r,
 
   constexpr math::Float eps = 1e-3;
 
-  if (depth <= 0)  // exceeded the bounce limit.
+  if (depth <= 0)  // exceeded the bounce limit, so no more light gathering.
     return Spectrum {0};
 
   hit_info hinfo;
   Float tBB;
 
   if (!(world.aabb().intersect(r, tBB)
-        && world.hit(r, eps, std::numeric_limits<Float>::max(), hinfo)))
+        && world.hit(r, eps, std::numeric_limits<Float>::max(), hinfo)))  // If ray hits nothing
   {
     // color background: horizontal gradiant
     // auto unit_dir = r.dir().normalized();
@@ -46,21 +46,24 @@ static auto traceRay(const partou::Ray& r,
     return background_color;
   }
 
-  Ray r_scattered;
-  Spectrum albedo;
+  scatter_info sinfo;
   Spectrum emitted = hinfo.mat_ptr->emitted({}, hinfo, hinfo.p);
-  Float pdf_val;
-
-  if (!hinfo.mat_ptr->scatter(r, hinfo, albedo, r_scattered, pdf_val))
+  if (!hinfo.mat_ptr->scatter(r, hinfo, sinfo))
     return emitted;
 
-  // sampling::CosinePDF cospdf {hinfo.normal};
-  // r_scattered = Ray(hinfo.p, cospdf.generate());
-  // pdf_val = cospdf.value(r_scattered.dir());
-  const sampling::HitablePDF light_pdf(lights, hinfo.p);
-  r_scattered = Ray(hinfo.p, light_pdf.generate());
-  pdf_val = light_pdf.value(r_scattered.dir());
+  if (sinfo.is_specular) { // Handle specular surface separately, as it has no pdf.
+    return sinfo.attenuation * traceRay(sinfo.specular_ray, world, lights, depth - 1);
+  }
 
+  const sampling::MixturePDF mixture_pdf {
+      sinfo.pdf_ptr,
+      std::make_shared<const sampling::HitablePDF>(lights, hinfo.p),
+  };
+
+  const auto r_scattered = Ray(hinfo.p, mixture_pdf.generate());
+  const auto pdf_val = mixture_pdf.value(r_scattered.dir());
+
+  auto albedo = sinfo.attenuation;
   albedo *= hinfo.mat_ptr->scattering_pdf(r, hinfo, r_scattered);
   albedo *= traceRay(r_scattered, world, lights, depth - 1) / pdf_val;
   return emitted + albedo;

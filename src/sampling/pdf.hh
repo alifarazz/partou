@@ -22,7 +22,7 @@ public:
 class CosinePDF : public PDF
 {
 public:
-  CosinePDF(const math::Vec3f& n)
+  explicit CosinePDF(const math::Vec3f& n)
       : onb {n}
   {
   }
@@ -43,7 +43,7 @@ public:
 class HitablePDF : public PDF
 {
 public:
-  HitablePDF(std::shared_ptr<const Hitable> hitable_ptr, const math::Vec3f& origin)
+  explicit HitablePDF(std::shared_ptr<const Hitable> hitable_ptr, const math::Vec3f& origin)
       : origin {origin}
       , hitable_ptr {hitable_ptr}
   {
@@ -61,4 +61,30 @@ public:
   math::Point3f origin;
   std::shared_ptr<const Hitable> hitable_ptr;
 };
+
+class MixturePDF : PDF
+{
+public:
+  MixturePDF(std::shared_ptr<const PDF> pdf0,
+             std::shared_ptr<const PDF> pdf1)  // TODO:use initializer list
+      : p0 {pdf0}
+      , p1 {pdf1}
+  {
+  }
+
+  auto value(const math::Vec3f& direction) const -> math::Float final override
+  {  // half of each should do the trick
+    return 0.5 * this->p0->value(direction) + 0.5 * this->p1->value(direction);
+  }
+
+  auto generate() const -> math::Vec3f final override
+  {
+    if (random::get(0, 1))  // coin toss
+      return p1->generate();
+    return p0->generate();
+  }
+
+  std::shared_ptr<const PDF> p0, p1;
+};
+
 }  // namespace partou::sampling

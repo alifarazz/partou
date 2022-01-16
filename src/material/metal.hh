@@ -17,16 +17,15 @@ public:
   {
   }
 
-  auto scatter(const Ray& r_in,
-               const hit_info& info,
-               Spectrum& albedo,
-               Ray& r_scattered,
-               math::Float& pdf) const -> bool final override
+  auto scatter(const Ray& r_in, const hit_info& h_info, scatter_info& s_info) const
+      -> bool final override
   {
-    const auto reflected = utils::reflect(r_in.dir().normalized(), info.normal);
-    r_scattered = Ray(info.p, reflected + m_fuzz * random::vec_in_sphere<math::Float>());
-    albedo = m_albedo;
-    return r_scattered.dir().dot(info.normal) > 0;
+    const auto reflected = utils::reflect(r_in.dir().normalized(), h_info.normal);
+    s_info.specular_ray = Ray(h_info.p, reflected + m_fuzz * random::vec_in_sphere<math::Float>());
+    s_info.attenuation = m_albedo;
+    s_info.is_specular = true;
+    s_info.pdf_ptr = nullptr; // HACK HACK HACK
+    return true;
   }
 
   math::Float m_fuzz;  // NOTE: if I used microfacet models, this would be unnecessary.

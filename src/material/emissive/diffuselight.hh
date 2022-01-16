@@ -13,8 +13,7 @@ public:
   {
   }
 
-  auto scatter(const Ray&, const hit_info&, Spectrum&, Ray&, math::Float&) const
-      -> bool final override
+  auto scatter(const Ray&, const hit_info&, scatter_info&) const -> bool final override
   {
     return false;
   }

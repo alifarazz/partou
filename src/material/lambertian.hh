@@ -1,6 +1,8 @@
 #pragma once
+
 #include "../math/onb.hh"
 #include "../random/random.hh"
+#include "../sampling/pdf.hh"
 #include "../shapes/hitable.hh"  // for hit_info definition
 #include "material.hh"
 
@@ -14,18 +16,13 @@ public:
   {
   }
 
-  auto scatter(const Ray&,
-               const hit_info& info,
-               Spectrum& albedo,
-               Ray& r_scattered,
-               math::Float& pdf) const -> bool final override
+  auto scatter(const Ray&, const hit_info& h_info, scatter_info& s_info) const
+      -> bool final override
   {  // doesn't depend on viewing direction (which is wi (which is r_in.dir() (r_in is the first
      // arg)))
-    const math::spatial::ONB onb {info.normal};
-    const auto scatter_direction = onb.local(random::cosine_direction<math::Float>());
-    r_scattered = Ray(info.p, scatter_direction.normalized());
-    albedo = m_albedo;
-    pdf = onb.n.dot(r_scattered.dir().normalized()) / math::PI;
+    s_info.is_specular = false;
+    s_info.attenuation = m_albedo;
+    s_info.pdf_ptr = std::move(std::make_shared<sampling::CosinePDF>(h_info.normal));
     return true;
   }
 

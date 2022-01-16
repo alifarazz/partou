@@ -36,9 +36,9 @@ using fsec = std::chrono::duration<float>;
 
 ////// globals
 constexpr auto aspect_ratio = 1.f;  // 4.F / 3.F;  // 16.0F / 9.0F;
-constexpr int image_width = 520;
+constexpr int image_width = 500;
 constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
-constexpr int spp_sqrt = 8;  // was 8
+constexpr int spp_sqrt = 10;  // was 8
 
 int main(int argc, char* argv[])
 {

@@ -1,16 +1,31 @@
 #pragma once
 
+#include <memory>
+
 #include "../color/color.hh"
 #include "../ray/ray.hh"
 
 namespace partou
 {
+
+namespace sampling
+{
+class PDF;
+}
+
+struct scatter_info
+{
+  bool is_specular;
+  std::shared_ptr<sampling::PDF> pdf_ptr;
+  Spectrum attenuation;
+  Ray specular_ray;
+};
 struct hit_info;
 
 class Material
 {
 public:
-  virtual auto scatter(const Ray&, const hit_info&, Spectrum&, Ray&, math::Float&) const -> bool
+  virtual auto scatter(const Ray&, const hit_info&, scatter_info&) const -> bool
   {
     return false;
   }
