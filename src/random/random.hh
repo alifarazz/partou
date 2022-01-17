@@ -67,7 +67,7 @@ inline auto vec_in_sphere() -> math::Vec3<T>
 template<typename T>
 requires std::is_floating_point_v<T>
 inline auto vec_in_hemisphere(const math::Vec3<T>& normal) -> math::Vec3<T>
-{
+{// TODO: FIXME: https://www.iquilezles.org/www/articles/dontflip/dontflip.htm
   const auto in_unit_sphere = vec_in_sphere<T>();
   return in_unit_sphere.dot(normal) > 0 ? in_unit_sphere : -in_unit_sphere;
 }

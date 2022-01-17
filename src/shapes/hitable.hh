@@ -49,15 +49,17 @@ public:
   virtual auto transformModel(const math::spatial::Transform& tModel) -> void = 0;
 
   virtual auto pdf_value(const math::Point3f&, const math::Vec3f&) const -> math::Float
-  {  // origin, dir
-    exit(-2);
-    return 0;
-  }
+      // {  // origin, dir
+      //   exit(-2);
+      //   return 0;
+      // }
+      = 0;
   virtual auto random(const math::Point3f&) const -> math::Vec3f
-  {  // origin
-    exit(-2);
-    return {1, 0, 0};
-  }
+      // {  // origin
+      //   exit(-2);
+      //   return {1, 0, 0};
+      // }
+      = 0;
 
 protected:
   Hitable() = default;

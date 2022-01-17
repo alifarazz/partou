@@ -2,6 +2,8 @@
 
 #include "../accel/AABB.hh"
 #include "../math/general.hh"
+#include "../math/onb.hh"
+#include "../random/random.hh"
 
 namespace partou
 {
@@ -25,6 +27,47 @@ auto Sphere::transformModel(const math::spatial::Transform& tModel) -> void
   radius *= tModel.m_scale.x;  // not using y and z beacuse this is not an ellipsis
   // A sphere has not rotation around it's center, so tModel.m_rotation is inappropriate
   computeBoundingBox();
+}
+
+auto Sphere::pdf_value(const math::Point3f& origin, const math::Vec3f& dir) const -> math::Float
+{
+  using namespace partou::math;
+  constexpr auto eps = 1e-3;
+
+  hit_info hinfo;
+  if (!this->hit(Ray(origin, dir), eps, std::numeric_limits<Float>::max(), hinfo))
+    return 0;
+
+  const auto cos_theta_max = std::sqrt(1 - pow2(radius) / (origin - dir).length2());
+  const auto solid_angle = 2 * math::PI * (1 - cos_theta_max);
+  return 1 / solid_angle;
+}
+
+static inline auto random_to_sphere(const math::Float& r, const math::Float& length2) -> math::Vec3f
+{
+  using namespace partou::math;
+
+  const auto r2 = random::unit<Float>();
+  const auto cos_theta_max = std::sqrt(1 - pow2(r) / length2);  // sqrt( 1 - sin( theta_max ) ** 2 )
+  const auto z = 1 + r2 * (cos_theta_max - 1);
+
+  const auto r1 = random::unit<Float>();
+  const auto phi = 2 * PI * r1;
+  const auto sin_theta = std::sqrt(1 - pow2(z));
+  const auto x = std::cos(phi) * sin_theta;
+  const auto y = std::sin(phi) * sin_theta;
+
+  return {x, y, z};
+}
+
+auto Sphere::random(const math::Point3f& origin) const -> math::Vec3f
+{
+  using namespace partou::math;
+
+  const auto direction = this->center - origin;
+  const auto distance2 = direction.length2();
+  const auto onb = spatial::ONB {direction};
+  return onb.local(random_to_sphere(this->radius, distance2));
 }
 
 // clang-format off
