@@ -39,7 +39,7 @@ public:
       pb.tick();
       i++;
     }
-    std::cerr << std::endl;
+    std::cout << std::endl;
   }
 
   FilmBuffer<PixelType>& filmbuffer;

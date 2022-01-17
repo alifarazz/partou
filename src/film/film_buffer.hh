@@ -8,7 +8,7 @@
 namespace partou
 {
 template<typename PixelType>
-class FilmBuffer // TODO: rename class to Film
+class FilmBuffer  // TODO: rename class to Film
 {
 private:
   std::size_t m_stride {};
@@ -44,14 +44,22 @@ public:
     return {y, x};
   }
   //
-  auto find_pixel(math::Vec2i yx) -> PixelType&
+  auto find_pixel(const math::Vec2i& yx) -> PixelType&
   {
     auto idx = get_idx(yx);
     return buf[idx];
   }
 
   // getter
-  auto pixel_color(math::Vec2i coord_yx) -> PixelType&
+  auto pixel_color(const math::Vec2l& coord_yx) -> PixelType&
+  {
+    return this->find_pixel(coord_yx);
+  }
+  auto pixel_color(const math::Vec2i& coord_yx) -> PixelType&
+  {
+    return this->find_pixel(coord_yx);
+  }
+  auto pixel_color(const math::Vec2s& coord_yx) -> PixelType&
   {
     return this->find_pixel(coord_yx);
   }

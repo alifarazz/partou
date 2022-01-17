@@ -13,7 +13,8 @@
 #include "io/obj.hh"
 #include "io/ppm.hh"
 //
-#include "integrator/uni_path_tracer.hh"
+// #include "integrator/uni_path_tracer.hh"
+#include "integrator/tiling.hh"
 //
 #include "film/film_buffer.hh"
 //
@@ -36,14 +37,17 @@ using fsec = std::chrono::duration<float>;
 
 ////// globals
 constexpr auto aspect_ratio = 1.f;  // 4.F / 3.F;  // 16.0F / 9.0F;
-constexpr int image_width = 500;
-constexpr int image_height = static_cast<int>(image_width / aspect_ratio);
+constexpr int w = 600;
 constexpr int spp_sqrt = 10;  // was 8
+
+constexpr int image_width = tiling::make_tile_friendly(w);
+constexpr int image_height = tiling::make_tile_friendly((image_width / aspect_ratio));
 
 int main(int argc, char* argv[])
 {
   using namespace partou;
   using namespace partou::shape;
+  std::cout.precision(2);
 
   if (argc < 2) {
     std::cerr << "Bad args" << std::endl;
@@ -181,7 +185,7 @@ int main(int argc, char* argv[])
 
   // Render
   const auto timeStart = Time::now();
-  integrator::uniPath::snap(filmbuffer, cam, world, lights);
+  tiling::serial_tile_snap(filmbuffer, cam, world, lights);
   const auto timeEnd = Time::now();
   std::cerr << std::endl;
 
@@ -207,10 +211,10 @@ int main(int argc, char* argv[])
   std::cout << "Total number of ray-triangles intersections : "
             << stats::numRayTrianglesIsect.load() << std::endl;
   std::cout << "Ray-triangles tests/intersects              : "
-            << Float(partou::stats::numRayTrianglesIsect.load())
-                   / partou::stats::numRayTrianglesTests.load() * 100
+            << percent<Float>(partou::stats::numRayTrianglesIsect.load(),
+                              partou::stats::numRayTrianglesTests.load())
             << "%" << std::endl;
   std::cout << "Total number of NaN pixels                  : " << stats::numNaNpixels << " ("
-            << Float(stats::numNaNpixels.load()) / filmbuffer.nx() * filmbuffer.ny() * 100 << "%)"
+            << percent<Float>(stats::numNaNpixels.load(), filmbuffer.nx() * filmbuffer.ny()) << "%)"
             << std::endl;
 }
