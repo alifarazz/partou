@@ -52,7 +52,7 @@ CppApplication {
     ]
     cpp.cxxLanguageVersion: "c++20"
     cpp.cxxFlags: ["-O3","-funroll-loops","-march=native","-mtune=native","-fgraphite-identity",
-    "-floop-nest-optimize","-floop-parallelize-all"]
+    "-floop-nest-optimize","-floop-parallelize-all","-DUSE_PCG"]
     cpp.linkerFlags: ["-lpthread","-flto"]
 
     cpp.warningLevel: "all"
