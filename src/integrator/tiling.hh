@@ -109,9 +109,9 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
     }
   };
 
-  std::vector<std::future<void>> tasks;
+  std::vector<std::future<void>> tasks(nthreads);
   for (int i = 0; i < nthreads; i++)
-    tasks.push_back(std::async(std::launch::async, thread_f));
+    tasks[i] = std::async(std::launch::async, thread_f);
 
   while (shared_tile_id < tile_count) {
     using namespace std::literals;
