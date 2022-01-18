@@ -14,6 +14,7 @@ CppApplication {
 "src/color/gamma2.hh",
 "src/color/linear_gamma.hh",
 "src/film/film_buffer.hh",
+"src/integrator/tiling.hh",
 "src/integrator/uni_path_tracer.hh",
 "src/io/obj.cc",
 "src/io/obj.hh",
@@ -50,8 +51,9 @@ CppApplication {
 "src/utils/progress_bar.hh",
     ]
     cpp.cxxLanguageVersion: "c++20"
-    cpp.cxxFlags: ["-O3","-funroll-loops","-march=native","-mtune=native","-flto","-fgraphite-identity",
-    "-floop-nest-optimize","-floop-parallelize-all","-DCHECK_SRGB_VALUES"]
+    cpp.cxxFlags: ["-O3","-funroll-loops","-march=native","-mtune=native","-fgraphite-identity",
+    "-floop-nest-optimize","-floop-parallelize-all","-DUSE_PCG"]
+    cpp.linkerFlags: ["-lpthread","-flto"]
 
     cpp.warningLevel: "all"
 

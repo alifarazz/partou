@@ -15,8 +15,9 @@
 //
 #include "../perf_stats/stats.hh"
 
-namespace partou::integrator::uniPath
+namespace partou::integrator::uniPathTracer
 {
+constexpr int_fast32_t TILESIZE = 16;
 constexpr int TRACER_MAX_DEPTH = 50;
 constexpr Spectrum background_color = sRGBSpectrum(0);
 
@@ -51,7 +52,7 @@ static auto traceRay(const partou::Ray& r,
   if (!hinfo.mat_ptr->scatter(r, hinfo, sinfo))
     return emitted;
 
-  if (sinfo.is_specular) { // Handle specular surface separately, as it has no pdf.
+  if (sinfo.is_specular) {  // Handle specular surface separately, as it has no pdf.
     return sinfo.attenuation * traceRay(sinfo.specular_ray, world, lights, depth - 1);
   }
 
@@ -72,48 +73,47 @@ static auto traceRay(const partou::Ray& r,
 static inline auto samplePixelJittered(const PinholeCamera& cam,
                                        const Hitable& world,
                                        std::shared_ptr<const Hitable>& lights,
-                                       const math::Vec2i& xy,
-                                       const math::Vec2i& iWH,
+                                       const math::Vec2i& pixel_coord,
+                                       const math::Vec2i& resolution,
                                        const int& spp_sqrt) -> math::Vec3f
 {  // Jittered supersampling
   using namespace partou::math;
 
   auto color = Vec3f {0};
-  const auto substep = 1 / Float(spp_sqrt);
+  const auto substep = inv(Float(spp_sqrt));  // god I hope c++ gets UFCS one day
+  const auto scaleInv = inv(Vec2f(resolution.x - 1, resolution.y - 1));
 
   for (int s_x = 0; s_x < spp_sqrt; s_x++) {
     for (int s_y = 0; s_y < spp_sqrt; s_y++) {
-      // Float u = static_cast<Float>(x) / (filmbuffer.nx() - 1);
-      // Float v = static_cast<Float>(y) / (filmbuffer.ny() - 1);
-      const auto pixel_space_pos = Vec2f {xy.x + s_x * substep + random::get(Float(0), substep),
-                                          xy.y + s_y * substep + random::get(Float(0), substep)};
+      const auto pixel_space_pos =
+          Vec2f {pixel_coord[1] + s_x * substep + random::get(Float(0), substep),
+                 pixel_coord[0] + s_y * substep + random::get(Float(0), substep)};
 
-      const Vec2f uv =
-          pixel_space_pos / Vec2f(iWH.x - 1, iWH.y - 1);  // refactor into film.make_uv()
+      const auto uv = pixel_space_pos * scaleInv;  // refactor into film.make_uv()
 
       auto r = cam.make_ray(uv[0], 1 - uv[1]);  // flip v because ppm-saver is upside down :(
       partou::stats::numPrimaryRays++;
       color += traceRay(r, world, lights);
-      // std::cerr << fmt::format("{}, {} = {}", j, i, color.x) << std::endl;
+      // std::cout << fmt::format("{}, {} = {}", j, i, color.x) << std::endl;
     }
   }
   return color;
 }
 
 template<typename T>
-static inline auto snap(FilmBuffer<T>& fb,
-                        const PinholeCamera& cam,
-                        const Hitable& world,
-                        std::shared_ptr<const Hitable>& lights) -> void
+static inline auto serial_snap(FilmBuffer<T>& fb,
+                               const PinholeCamera& cam,
+                               const Hitable& world,
+                               std::shared_ptr<const Hitable>& lights) -> void
 {
-  const auto dims = math::Vec2i {int(fb.nx()), int(fb.ny())};
+  const auto resolution = math::Vec2i {int(fb.nx()), int(fb.ny())};
   for (int j = int(fb.ny()) - 1; j >= 0; j--) {
     if (j % 1 << 12 == 0)  // TODO: use progress bar
-      std::cerr << "\rtraceRay-> Scanlines remaining:\t\t" << j << ' ' << std::flush;
+      std::cout << "\rtraceRay-> Scanlines remaining:\t\t" << j << ' ' << std::flush;
 
     for (int i = 0; i < int(fb.nx()); i++) {
       fb.pixel_color(j, i) =
-          samplePixelJittered(cam, world, lights, {i, j}, dims, fb.sample_per_pixel_sqrt);
+          samplePixelJittered(cam, world, lights, {j, i}, resolution, fb.sample_per_pixel_sqrt);
     }
   }
 }

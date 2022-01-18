@@ -17,7 +17,7 @@ public:
   explicit ProgressBar(std::size_t total,
                        std::string_view msg_view = std::string_view {""},
                        std::size_t tick_duration_shift = 0,
-                       std::ostream& out = std::cerr,
+                       std::ostream& out = std::cout,
                        std::size_t idx = 0)
       : total {total >> tick_duration_shift}
       , m_msg_view {msg_view}

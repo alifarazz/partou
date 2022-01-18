@@ -15,7 +15,7 @@ using Double = double;
 using Degree = Float;
 using Radian = Float;
 
-inline constexpr Float PI = 3.14159265358979323846; // std::numbers::pi
+inline constexpr Float PI = 3.14159265358979323846;  // std::numbers::pi
 inline constexpr Float INV_PI = 0.31830988618379067154;
 inline constexpr Float HALF_PI = 1.57079632679489661923;
 inline constexpr Float TWO_PI = 6.283185307179586476925;
@@ -50,6 +50,13 @@ inline auto sqrt(const T a) -> T
 }
 
 template<typename T>
+requires std::is_floating_point_v<T>
+inline auto inv(const T a) -> T
+{
+  return T(1) / a;
+}
+
+template<typename T>
 inline auto clamp(const T x, const T min, const T max) -> T
 {
   if (x < min)
@@ -57,5 +64,19 @@ inline auto clamp(const T x, const T min, const T max) -> T
   if (x > max)
     return max;
   return x;
+}
+
+template<typename R, typename T, typename U>
+requires std::is_floating_point_v<R>
+inline auto percent(const T i, const U n) -> R
+{
+  return static_cast<R>(Float(i) / Float(n) * Float(100));
+}
+
+template<typename R, typename T, typename U>
+requires std::is_integral_v<R>
+inline auto percent(const T i, const U n) -> R
+{
+  return static_cast<R>(std::round((Float(i) / Float(n) * Float(100))));
 }
 }  // namespace partou::math

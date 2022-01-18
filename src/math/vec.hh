@@ -101,4 +101,11 @@ inline static auto sqrt(const Vec3<T>& v) -> Vec3<T>
       std::sqrt(v[2]),
   };
 }
+
+template<typename T>
+requires std::is_floating_point_v<T>
+inline static auto inv(const Vec2<T>& v) -> Vec2<T>
+{
+  return {inv(v[0]), inv(v[1])};
+}
 }  // namespace partou::math
