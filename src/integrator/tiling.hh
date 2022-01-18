@@ -31,14 +31,13 @@ static inline auto snap_tile(FilmBuffer<T>& fb,
                              const Hitable& world,
                              std::shared_ptr<const Hitable>& lights,
                              const math::Vec2i& resolution,
-                             const math::Vec2i& tile_size,
                              const math::Vec2i& tile_offset) -> void
 {
   using namespace partou::math;
 
   // render tile
-  for (int j = 0; j < tile_size.y; j++)
-    for (int i = 0; i < tile_size.x; i++) {
+  for (int j = 0; j < TILESIZE; j++)
+    for (int i = 0; i < TILESIZE; i++) {
       const auto pixel_coord = tile_offset + Vec2i {j, i};
       fb.pixel_color(pixel_coord) = integrator::uniPathTracer::samplePixelJittered(
           cam, world, lights, pixel_coord, resolution, fb.sample_per_pixel_sqrt);
@@ -68,7 +67,7 @@ static auto serial_tile_snap(FilmBuffer<T>& fb,
   for (int tile = 0; tile < tile_count; tile++) {
     report_progress(std::cout, tile, tile_count);
     const auto offset = Vec2i {tile % tile_size.x, tile / tile_size.y} * TILESIZE;
-    snap_tile(fb, cam, world, lights, resolution, {TILESIZE, TILESIZE}, offset);
+    snap_tile(fb, cam, world, lights, resolution, offset);
   }
 }
 
@@ -104,7 +103,7 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
         return;
 
       const auto offset = Vec2i {tile % tile_size.x, tile / tile_size.y} * TILESIZE;
-      snap_tile(fb, cam, world, lights, resolution, {TILESIZE, TILESIZE}, offset);
+      snap_tile(fb, cam, world, lights, resolution, offset);
     }
   };
 
