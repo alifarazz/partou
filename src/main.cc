@@ -38,7 +38,7 @@ using fsec = std::chrono::duration<float>;
 ////// globals
 constexpr auto aspect_ratio = 1.f;  // 4.F / 3.F;  // 16.0F / 9.0F;
 constexpr int w = 600;
-constexpr int spp_sqrt = 10;  // was 8
+constexpr int spp_sqrt = 4;  // was 8
 
 constexpr int image_width = tiling::make_tile_friendly(w);
 constexpr int image_height = tiling::make_tile_friendly((image_width / aspect_ratio));

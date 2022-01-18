@@ -21,7 +21,7 @@ constexpr int_fast32_t TILESIZE = 16;
 constexpr int TRACER_MAX_DEPTH = 50;
 constexpr Spectrum background_color = sRGBSpectrum(0);
 
-static auto traceRay(const partou::Ray& r,
+static auto recurTraceRay(const partou::Ray& r,
                      const partou::Hitable& world,
                      std::shared_ptr<const Hitable>& lights,
                      int depth = TRACER_MAX_DEPTH) -> Spectrum
@@ -53,7 +53,7 @@ static auto traceRay(const partou::Ray& r,
     return emitted;
 
   if (sinfo.is_specular) {  // Handle specular surface separately, as it has no pdf.
-    return sinfo.attenuation * traceRay(sinfo.specular_ray, world, lights, depth - 1);
+    return sinfo.attenuation * recurTraceRay(sinfo.specular_ray, world, lights, depth - 1);
   }
 
   const sampling::MixturePDF mixture_pdf {
@@ -66,8 +66,83 @@ static auto traceRay(const partou::Ray& r,
 
   auto albedo = sinfo.attenuation;
   albedo *= hinfo.mat_ptr->scattering_pdf(r, hinfo, r_scattered);
-  albedo *= traceRay(r_scattered, world, lights, depth - 1) / pdf_val;
+  albedo *= recurTraceRay(r_scattered, world, lights, depth - 1) / pdf_val;
   return emitted + albedo;
+}
+
+static auto iterTraceRay(const partou::Ray& ray,
+                         const partou::Hitable& world,
+                         std::shared_ptr<const Hitable>& lights,
+                         int max_depth = TRACER_MAX_DEPTH) -> Spectrum
+{  // Uni-directional path tracer
+  using namespace partou;
+  using namespace partou::math;
+
+  constexpr math::Float eps = 1e-3;
+  static thread_local std::array<Spectrum, TRACER_MAX_DEPTH> emitteds, albedos;  // HACK
+  Spectrum final_bounce;
+
+  auto r = ray;
+  int depth = 0;
+  for (;;) {
+    if (depth == max_depth) {  // exceeded the bounce limit, so no more light gathering.
+      final_bounce = Spectrum {0};
+      break;
+    }
+
+    hit_info hinfo;
+    Float tBB;
+
+    if (!(world.aabb().intersect(r, tBB)
+          && world.hit(r, eps, std::numeric_limits<Float>::max(), hinfo)))  // If ray hits nothing
+    {
+      // color background: horizontal gradiant
+      // auto unit_dir = r.dir().normalized();
+      // auto t = (unit_dir.y + 1.0F) / 2.0F;
+      // return math::interpolate_linear(math::Vec3f(.5, .7, 1), math::Vec3f(1), t);
+      //
+      // return background_color;  // ???
+      final_bounce = background_color;
+      break;
+    }
+
+    scatter_info sinfo;
+    Spectrum emitted = hinfo.mat_ptr->emitted({}, hinfo, hinfo.p);
+    if (!hinfo.mat_ptr->scatter(r, hinfo, sinfo)) {
+      final_bounce = emitted;
+      break;  // return emitted;
+    }
+
+    if (sinfo.is_specular) {  // Handle specular surface separately, as it has no pdf.
+      albedos[depth] = sinfo.attenuation;  // *
+      emitteds[depth] = Spectrum {0};  // +
+      r = sinfo.specular_ray;
+      depth++;
+      continue;
+      // return sinfo.attenuation*traceRay(sinfo.specular_ray, world, lights, depth - 1);
+    }
+
+    const sampling::MixturePDF mixture_pdf {
+        sinfo.pdf_ptr,
+        std::make_shared<const sampling::HitablePDF>(lights, hinfo.p),
+    };
+
+    const auto r_scattered = Ray(hinfo.p, mixture_pdf.generate());
+    const auto pdf_val = mixture_pdf.value(r_scattered.dir());
+
+    auto albedo = sinfo.attenuation;
+    albedo *= hinfo.mat_ptr->scattering_pdf(r, hinfo, r_scattered);
+    albedo *= /*traceRay(r_scattered, world, lights, depth - 1) * */ inv(pdf_val);
+
+    albedos[depth] = albedo;
+    emitteds[depth] = emitted;
+    r = r_scattered;  // return emitted + albedo;
+    depth++;
+  }
+
+  for (int i = depth - 1; i >= 0; i--)
+    final_bounce = emitteds[i] + final_bounce * albedos[i];
+  return final_bounce;
 }
 
 static inline auto samplePixelJittered(const PinholeCamera& cam,
@@ -93,8 +168,8 @@ static inline auto samplePixelJittered(const PinholeCamera& cam,
 
       auto r = cam.make_ray(uv[0], 1 - uv[1]);  // flip v because ppm-saver is upside down :(
       partou::stats::numPrimaryRays++;
-      color += traceRay(r, world, lights);
-      // std::cout << fmt::format("{}, {} = {}", j, i, color.x) << std::endl;
+      // color += recurTraceRay(r, world, lights);
+      color += iterTraceRay(r, world, lights);
     }
   }
   return color;
@@ -118,4 +193,4 @@ static inline auto serial_snap(FilmBuffer<T>& fb,
   }
 }
 
-}  // namespace partou::integrator::uniPath
+}  // namespace partou::integrator::uniPathTracer

@@ -100,12 +100,12 @@ static inline auto cosine_direction() -> math::Vec3<T>
   using namespace partou::random;
   using namespace partou::math;
 
-  const auto r1 = unit<Float>(), r2 = unit<Float>();
-  const auto z = std::sqrt(1 - r2);
+  const auto r2 = unit<Float>();  // cos theta
+  const auto z = std::sqrt(1 - r2);  // sin theta
 
-  const auto phi = 2 * PI * r1;
-  const auto x = std::cos(phi) * std::sqrt(r2);
-  const auto y = std::sin(phi) * std::sqrt(r2);
+  const auto phi = angle<Float>();
+  const auto x = std::cos(phi) * std::sqrt(r2);  // cos phi * cos theta
+  const auto y = std::sin(phi) * std::sqrt(r2);  // sin phi * cos theta
 
   return {x, y, z};
 }

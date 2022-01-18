@@ -51,8 +51,7 @@ static inline auto random_to_sphere(const math::Float& r, const math::Float& len
   const auto cos_theta_max = std::sqrt(1 - pow2(r) / length2);  // sqrt( 1 - sin( theta_max ) ** 2 )
   const auto z = 1 + r2 * (cos_theta_max - 1);
 
-  const auto r1 = random::unit<Float>();
-  const auto phi = 2 * PI * r1;
+  const auto phi = random::angle<Float>();
   const auto sin_theta = std::sqrt(1 - pow2(z));
   const auto x = std::cos(phi) * sin_theta;
   const auto y = std::sin(phi) * sin_theta;
