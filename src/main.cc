@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
 
   // Render
   const auto timeStart = Time::now();
-  tiling::serial_tile_snap(filmbuffer, cam, world, lights);
+  tiling::parallel_tile_snap(filmbuffer, cam, world, lights);
   const auto timeEnd = Time::now();
   std::cerr << std::endl;
 

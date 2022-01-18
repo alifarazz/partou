@@ -51,8 +51,9 @@ CppApplication {
 "src/utils/progress_bar.hh",
     ]
     cpp.cxxLanguageVersion: "c++20"
-    cpp.cxxFlags: ["-O3","-funroll-loops","-march=native","-mtune=native","-flto","-fgraphite-identity",
-    "-floop-nest-optimize","-floop-parallelize-all","-DCHECK_SRGB_VALUES"]
+    cpp.cxxFlags: ["-O3","-funroll-loops","-march=native","-mtune=native","-fgraphite-identity",
+    "-floop-nest-optimize","-floop-parallelize-all"]
+    cpp.linkerFlags: ["-lpthread","-flto"]
 
     cpp.warningLevel: "all"
 
