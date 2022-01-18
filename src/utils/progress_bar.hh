@@ -37,5 +37,10 @@ public:
       m_tick_duration_counter--;
     }
   }
+  void final_tick()
+  {
+    m_out << '\r' << m_msg_view << ": "
+          << "100%" << std::endl;
+  }
 };
 }  // namespace partou::cli

@@ -56,7 +56,7 @@ static auto serial_tile_snap(FilmBuffer<T>& fb,
 
   auto report_progress = [](std::ostream& os, const auto i, const auto n)
   {
-    os << "\rpartou::tiling::serial_tile_snap-> "
+    os << "\rtiling::serial_tile_snap-> "
        << "tiles remaining: " << percent<int>(i, n) << "% (" << n - i << " out of " << n << ")"
        << std::flush;
   };
@@ -82,12 +82,12 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
 {
   using namespace partou::math;
 
-  size_t max_threads = std::thread::hardware_concurrency();
+  int max_threads = std::thread::hardware_concurrency();
   nthreads = (nthreads < 1 || nthreads > max_threads) ? max_threads : nthreads;
 
   auto report_progress = [](std::ostream& os, const auto i, const auto n)
   {
-    os << "\rpartou::tiling::parallel_tile_snap-> "
+    os << "\rtiling::parallel_tile_snap-> "
        << "tiles remaining: " << percent<int>(i, n) << "% (" << n - i << " out of " << n << ")"
        << std::flush;
   };

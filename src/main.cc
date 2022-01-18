@@ -38,7 +38,7 @@ using fsec = std::chrono::duration<float>;
 ////// globals
 constexpr auto aspect_ratio = 1.f;  // 4.F / 3.F;  // 16.0F / 9.0F;
 constexpr int w = 600;
-constexpr int spp_sqrt = 4;  // was 8
+constexpr int spp_sqrt = 10;  // was 8
 
 constexpr int image_width = tiling::make_tile_friendly(w);
 constexpr int image_height = tiling::make_tile_friendly((image_width / aspect_ratio));
@@ -74,8 +74,8 @@ int main(int argc, char* argv[])
   const PinholeCamera cam(lookFrom, lookAt, vUp, fov, aspect_ratio);
 
   // Transform
-  const auto lookLeft =
-      spatial::Transform {Vec3f {.12, .1, 0}, Vec3f {1.1}, Vec3f {0, PI / 6, PI / 6}};
+  // const auto lookLeft =
+  //     spatial::Transform {Vec3f {.12, .1, 0}, Vec3f {1.1}, Vec3f {0, PI / 6, PI / 6}};
   // const auto lookRight = spatial::Transform {Vec3f {0}, Vec3f {1}, Vec3f {0, -PI / 6, 0}};
 
   // Material
@@ -198,8 +198,8 @@ int main(int argc, char* argv[])
   ////// Diagnostics
   fsec fs = timeEnd - timeStart;
   std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Render time                                 : " << fs.count() << " sec"
-            << std::endl;
+  std::cout << "Render time                                 : " << int_fast64_t(fs.count())
+            << " secs" << std::endl;
   std::cout << "Total number of primary rays                : " << stats::numPrimaryRays.load()
             << std::endl;
   std::cout << "Total number of ray-bbox tests              : " << stats::numRayBBoxTests.load()
@@ -215,6 +215,6 @@ int main(int argc, char* argv[])
                               partou::stats::numRayTrianglesTests.load())
             << "%" << std::endl;
   std::cout << "Total number of NaN pixels                  : " << stats::numNaNpixels << " ("
-            << percent<Float>(stats::numNaNpixels.load(), filmbuffer.nx() * filmbuffer.ny()) << "%)"
+            << percent<Float>(stats::numNaNpixels.load(), filmbuffer.resolution()) << "%)"
             << std::endl;
 }

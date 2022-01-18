@@ -68,6 +68,11 @@ public:
     return this->pixel_color(math::Vec2i {ny, nx});
   }
 
+  auto resolution() const -> std::int_fast64_t
+  {
+    return nx() * ny();
+  }
+
   // setter
   void pixel_color(int ny, int nx, const PixelType& pixel_data) const
   {
