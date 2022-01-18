@@ -15,6 +15,8 @@
 //
 #include "uni_path_tracer.hh"
 
+// Thanks iq!
+// all from https://www.iquilezles.org/www/articles/cputiles/cputiles.htm
 namespace partou::tiling
 {
 constexpr int_fast32_t TILESIZE = 16;
