@@ -23,7 +23,7 @@ public:
     using namespace partou::utils;
 
     s_info.is_specular = true;
-    s_info.pdf_ptr = nullptr; // HACK HACK HACK
+    // s_info.pdf_ptr = nullptr;  // HACK HACK HACK
     s_info.attenuation = Spectrum {1};
 
     const auto refraction_ratio = h_info.is_front_facing ? (Float(1) / ior) : ior;
@@ -36,7 +36,7 @@ public:
 
     const auto ow =
         (refraction_ratio * sin_theta < 1  // total internal reflection check
-         || fresnel_reflectance_probability
+         || fresnel_reflectance_probability  // russian roulette (Arnold does the same)
                 > random::unit<Float>()  // reflect if iw too close to macrosurface normal
          )
             ? refract(iw, h_info.normal, refraction_ratio, cos_theta)

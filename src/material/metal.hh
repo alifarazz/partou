@@ -24,7 +24,7 @@ public:
     s_info.specular_ray = Ray(h_info.p, reflected + m_fuzz * random::vec_in_sphere<math::Float>());
     s_info.attenuation = m_albedo;
     s_info.is_specular = true;
-    s_info.pdf_ptr = nullptr; // HACK HACK HACK
+    // s_info.pdf_ptr = nullptr; // HACK HACK HACK
     return true;
   }
 
