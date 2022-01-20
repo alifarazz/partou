@@ -27,7 +27,7 @@ public:
 
   auto save(std::ostream& out) const -> void
   {
-    cli::ProgressBar pb {filmbuffer.buf.size() - 1, "PPMImageSaver::save->\tProgress", 4};
+    cli::ProgressBar pb {filmbuffer.buf.size() - 1, "PPMImageSaver::save\tsaving", 4};
     out << "P3\n" << filmbuffer.nx() << " " << filmbuffer.ny() << "\n255\n";
 
     std::size_t i {};

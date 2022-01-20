@@ -32,11 +32,14 @@ public:
     const auto cos_theta = std::min(-iw.dot(h_info.normal), Float(1));
     const auto sin_theta = sqrt(1 - pow2(cos_theta));
 
+    // it's not a probability, but we'll treat it has one. Actually it dictates to contribution of
+    // refraction and reflection to the final color of the incident ray. For fresnel = .8:
+    // final_color = .8 * refreact + (1 - .8) * reflect
     const auto fresnel_reflectance_probability = fresnel_reflectance(cos_theta, ior);
 
     const auto ow =
         (refraction_ratio * sin_theta < 1  // total internal reflection check
-         || fresnel_reflectance_probability  // russian roulette (Arnold does the same)
+         || fresnel_reflectance_probability  // russian roulette (inspired by Arnold renderer)
                 > random::unit<Float>()  // reflect if iw too close to macrosurface normal
          )
             ? refract(iw, h_info.normal, refraction_ratio, cos_theta)
