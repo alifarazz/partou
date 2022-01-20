@@ -31,7 +31,7 @@ template<typename T>
 static inline auto snap_tile(FilmBuffer<T>& fb,
                              const PinholeCamera& cam,
                              const Hitable& world,
-                             std::shared_ptr<const Hitable>& lights,
+                             const std::shared_ptr<const Hitable>& lights,
                              const math::Vec2i& resolution,
                              const math::Vec2i& tile_offset) -> void
 {
@@ -50,7 +50,7 @@ template<typename T>
 static auto serial_tile_snap(FilmBuffer<T>& fb,
                              const PinholeCamera& cam,
                              const Hitable& world,
-                             std::shared_ptr<const Hitable>& lights) -> void
+                             const std::shared_ptr<const Hitable>& lights) -> void
 {
   using namespace partou::math;
 
@@ -62,14 +62,14 @@ static auto serial_tile_snap(FilmBuffer<T>& fb,
   };
 
   const auto resolution = math::Vec2i {int(fb.nx()), int(fb.ny())};
-  const Vec2i tile_size = resolution / TILESIZE;
+  const auto tile_size = resolution / TILESIZE;
   const auto tile_count = tile_size.x * tile_size.y;
 
   // render tiles
   for (int tile = 0; tile < tile_count; tile++) {
     report_progress(std::cout, tile, tile_count);
-    const auto offset = Vec2i {tile % tile_size.x, tile / tile_size.y} * TILESIZE;
-    snap_tile(fb, cam, world, lights, resolution, offset);
+    auto&& offset = Vec2i {tile % tile_size.x, tile / tile_size.y} * TILESIZE;
+    snap_tile(fb, cam, world, lights, resolution, std::move(offset));
   }
 }
 
@@ -77,7 +77,7 @@ template<typename T>
 static auto parallel_tile_snap(FilmBuffer<T>& fb,
                                const PinholeCamera& cam,
                                const Hitable& world,
-                               std::shared_ptr<const Hitable>& lights,
+                               const std::shared_ptr<const Hitable>& lights,
                                int nthreads = -1) -> void
 {
   using namespace partou::math;
@@ -93,7 +93,7 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
   };
 
   const auto resolution = math::Vec2i {int(fb.nx()), int(fb.ny())};
-  const Vec2i tile_size = resolution / TILESIZE;
+  const auto tile_size = resolution / TILESIZE;
   const auto tile_count = tile_size.x * tile_size.y;
 
   std::atomic_int shared_tile_id = 0;
@@ -104,14 +104,14 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
       if (tile >= tile_count)
         return;
 
-      const auto offset = Vec2i {tile % tile_size.x, tile / tile_size.y} * TILESIZE;
-      snap_tile(fb, cam, world, lights, resolution, offset);
+      auto&& offset = Vec2i {tile % tile_size.x, tile / tile_size.y} * TILESIZE;
+      snap_tile(fb, cam, world, lights, resolution, std::move(offset));
     }
   };
 
   std::vector<std::future<void>> tasks(nthreads);
   for (int i = 0; i < nthreads; i++)
-    tasks[i] = std::async(std::launch::async, thread_f);
+    tasks[i] = std::move(std::async(std::launch::async, thread_f));
 
   while (shared_tile_id < tile_count) {
     using namespace std::literals;
@@ -122,7 +122,7 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
 
   report_progress(std::cout, tile_count, tile_count);
 
-  for (int i = 0; i < nthreads; i++)
+  for (int i = 0; i < nthreads; i++)  // shouldn't be needed, I put it here for good measure
     tasks[i].wait();
 }
 }  // namespace partou::tiling

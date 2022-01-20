@@ -43,7 +43,8 @@ public:
 class HitablePDF : public PDF
 {
 public:
-  explicit HitablePDF(std::shared_ptr<const Hitable> hitable_ptr, const math::Vec3f& origin)
+  // l-value reference shared_ptr is terrible idea
+  explicit HitablePDF(const std::shared_ptr<const Hitable>& hitable_ptr, const math::Vec3f& origin)
       : origin {origin}
       , hitable_ptr {hitable_ptr}
   {
@@ -59,16 +60,16 @@ public:
   }
 
   math::Point3f origin;
-  std::shared_ptr<const Hitable> hitable_ptr;
+  const std::shared_ptr<const Hitable>& hitable_ptr;
 };
 
 class MixturePDF : PDF
 {
 public:
-  MixturePDF(std::shared_ptr<const PDF> pdf0,
-             std::shared_ptr<const PDF> pdf1)  // TODO:use initializer list
-      : p0 {pdf0}
-      , p1 {pdf1}
+  MixturePDF(std::unique_ptr<const PDF>&& pdf0,
+             std::unique_ptr<const PDF>&& pdf1)  // TODO:use initializer list
+      : p0 {std::move(pdf0)}
+      , p1 {std::move(pdf1)}
   {
   }
 
@@ -84,7 +85,7 @@ public:
     return p0->generate();
   }
 
-  std::shared_ptr<const PDF> p0, p1;
+  std::unique_ptr<const PDF> p0, p1;
 };
 
 }  // namespace partou::sampling

@@ -21,58 +21,11 @@ constexpr int_fast32_t TILESIZE = 16;
 constexpr int TRACER_MAX_DEPTH = 50;
 constexpr Spectrum background_color = sRGBSpectrum(0);
 
-static auto recurTraceRay(const partou::Ray& r,
-                     const partou::Hitable& world,
-                     std::shared_ptr<const Hitable>& lights,
-                     int depth = TRACER_MAX_DEPTH) -> Spectrum
-{  // Uni-directional path tracer
-  using namespace partou;
-  using namespace partou::math;
-
-  constexpr math::Float eps = 1e-3;
-
-  if (depth <= 0)  // exceeded the bounce limit, so no more light gathering.
-    return Spectrum {0};
-
-  hit_info hinfo;
-  Float tBB;
-
-  if (!(world.aabb().intersect(r, tBB)
-        && world.hit(r, eps, std::numeric_limits<Float>::max(), hinfo)))  // If ray hits nothing
-  {
-    // color background: horizontal gradiant
-    // auto unit_dir = r.dir().normalized();
-    // auto t = (unit_dir.y + 1.0F) / 2.0F;
-    // return math::interpolate_linear(math::Vec3f(.5, .7, 1), math::Vec3f(1), t);
-    return background_color;
-  }
-
-  scatter_info sinfo;
-  Spectrum emitted = hinfo.mat_ptr->emitted({}, hinfo, hinfo.p);
-  if (!hinfo.mat_ptr->scatter(r, hinfo, sinfo))
-    return emitted;
-
-  if (sinfo.is_specular) {  // Handle specular surface separately, as it has no pdf.
-    return sinfo.attenuation * recurTraceRay(sinfo.specular_ray, world, lights, depth - 1);
-  }
-
-  const sampling::MixturePDF mixture_pdf {
-      sinfo.pdf_ptr,
-      std::make_shared<const sampling::HitablePDF>(lights, hinfo.p),
-  };
-
-  const auto r_scattered = Ray(hinfo.p, mixture_pdf.generate());
-  const auto pdf_val = mixture_pdf.value(r_scattered.dir());
-
-  auto albedo = sinfo.attenuation;
-  albedo *= hinfo.mat_ptr->scattering_pdf(r, hinfo, r_scattered);
-  albedo *= recurTraceRay(r_scattered, world, lights, depth - 1) / pdf_val;
-  return emitted + albedo;
-}
-
+// I know taking lvalue reference of shared_ptr is a huge code smell, but
+// I don't have time come up with a better solution.
 static auto iterTraceRay(const partou::Ray& ray,
                          const partou::Hitable& world,
-                         std::shared_ptr<const Hitable>& lights,
+                         const std::shared_ptr<const Hitable>& lights,
                          int max_depth = TRACER_MAX_DEPTH) -> Spectrum
 {  // Uni-directional path tracer
   using namespace partou;
@@ -123,8 +76,8 @@ static auto iterTraceRay(const partou::Ray& ray,
     }
 
     const sampling::MixturePDF mixture_pdf {
-        sinfo.pdf_ptr,
-        std::make_shared<const sampling::HitablePDF>(lights, hinfo.p),
+        std::move(sinfo.pdf_ptr),
+        std::make_unique<const sampling::HitablePDF>(lights, hinfo.p),
     };
 
     const auto r_scattered = Ray(hinfo.p, mixture_pdf.generate());
@@ -147,7 +100,7 @@ static auto iterTraceRay(const partou::Ray& ray,
 
 static inline auto samplePixelJittered(const PinholeCamera& cam,
                                        const Hitable& world,
-                                       std::shared_ptr<const Hitable>& lights,
+                                       const std::shared_ptr<const Hitable>& lights,
                                        const math::Vec2i& pixel_coord,
                                        const math::Vec2i& resolution,
                                        const int& spp_sqrt) -> math::Vec3f
@@ -193,4 +146,52 @@ static inline auto serial_snap(FilmBuffer<T>& fb,
   }
 }
 
+static auto recurTraceRay(const partou::Ray& r,
+                          const partou::Hitable& world,
+                          std::shared_ptr<const Hitable>& lights,
+                          int depth = TRACER_MAX_DEPTH) -> Spectrum
+{  // Uni-directional path tracer
+  using namespace partou;
+  using namespace partou::math;
+
+  constexpr math::Float eps = 1e-3;
+
+  if (depth <= 0)  // exceeded the bounce limit, so no more light gathering.
+    return Spectrum {0};
+
+  hit_info hinfo;
+  Float tBB;
+
+  if (!(world.aabb().intersect(r, tBB)
+        && world.hit(r, eps, std::numeric_limits<Float>::max(), hinfo)))  // If ray hits nothing
+  {
+    // color background: horizontal gradiant
+    // auto unit_dir = r.dir().normalized();
+    // auto t = (unit_dir.y + 1.0F) / 2.0F;
+    // return math::interpolate_linear(math::Vec3f(.5, .7, 1), math::Vec3f(1), t);
+    return background_color;
+  }
+
+  scatter_info sinfo;
+  Spectrum emitted = hinfo.mat_ptr->emitted({}, hinfo, hinfo.p);
+  if (!hinfo.mat_ptr->scatter(r, hinfo, sinfo))
+    return emitted;
+
+  if (sinfo.is_specular) {  // Handle specular surface separately, as it has no pdf.
+    return sinfo.attenuation * recurTraceRay(sinfo.specular_ray, world, lights, depth - 1);
+  }
+
+  const sampling::MixturePDF mixture_pdf {
+      std::move(sinfo.pdf_ptr),
+      std::make_unique<const sampling::HitablePDF>(lights, hinfo.p),
+  };
+
+  const auto r_scattered = Ray(hinfo.p, mixture_pdf.generate());
+  const auto pdf_val = mixture_pdf.value(r_scattered.dir());
+
+  auto albedo = sinfo.attenuation;
+  albedo *= hinfo.mat_ptr->scattering_pdf(r, hinfo, r_scattered);
+  albedo *= recurTraceRay(r_scattered, world, lights, depth - 1) / pdf_val;
+  return emitted + albedo;
+}
 }  // namespace partou::integrator::uniPathTracer

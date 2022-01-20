@@ -22,7 +22,7 @@ public:
      // arg)))
     s_info.is_specular = false;
     s_info.attenuation = m_albedo;
-    s_info.pdf_ptr = std::move(std::make_shared<sampling::CosinePDF>(h_info.normal));
+    s_info.pdf_ptr = std::move(std::make_unique<sampling::CosinePDF>(h_info.normal));
     return true;
   }
 

@@ -16,7 +16,7 @@ class PDF;
 struct scatter_info
 {
   bool is_specular;
-  std::shared_ptr<sampling::PDF> pdf_ptr;
+  std::unique_ptr<sampling::PDF> pdf_ptr;
   Spectrum attenuation;
   Ray specular_ray;
 };
