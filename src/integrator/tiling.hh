@@ -4,6 +4,7 @@
 #include <chrono>
 #include <future>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 #include "../camera/pinhole_camera.hh"
@@ -82,14 +83,34 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
 {
   using namespace partou::math;
 
-  int max_threads = std::thread::hardware_concurrency();
-  nthreads = (nthreads < 1 || nthreads > max_threads) ? max_threads : nthreads;
-
-  auto report_progress = [](std::ostream& os, const auto i, const auto n)
+  constexpr int deltas_size = 1 << 3;  // can further be optimzed, no need to hold all the values
+  constexpr std::chrono::milliseconds sleep_duration(350);
+  auto report_progress =
+      [=, deltas = std::array<int, deltas_size> {0}, prev_i = 0, delay = deltas_size](
+          std::ostream& os, const int i, const int n) mutable
   {
-    os << "\rtiling::parallel_tile_snap-> "
-       << "tiles remaining: " << percent<int>(i, n) << "% (" << n - i << " out of " << n << ")"
-       << std::flush;
+    for (int i = 0; i < deltas_size - 1; i++)
+      deltas[i] = deltas[i + 1];
+    deltas[deltas_size - 1] = i - prev_i;
+    prev_i = i;
+
+    constexpr std::chrono::milliseconds one_sec(1000);
+    constexpr Float ratio = Float(one_sec.count()) / Float(sleep_duration.count());
+
+    const Float avg_render_speed_per_sleep_duration =
+        std::accumulate(deltas.begin(), deltas.end(), 0) / Float(deltas.size());
+    const Float speed = ratio * avg_render_speed_per_sleep_duration;
+    const int secs = std::round((n - i) / speed);
+
+    os << "\rparallel_tile_snap\t"
+       << "tiles remaining: " << percent<int>(i, n) << "% (" << n - i << " out of " << n << ")";
+    if (delay) {
+      std::cout << std::flush;
+      delay--;
+      return;
+    } else {
+      std::cout << ", time remaining: " << secs << " secs     " << std::flush;
+    }
   };
 
   const auto resolution = math::Vec2i {int(fb.nx()), int(fb.ny())};
@@ -109,6 +130,9 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
     }
   };
 
+  int max_threads = std::thread::hardware_concurrency();
+  nthreads = (nthreads < 1 || nthreads > max_threads) ? max_threads : nthreads;
+
   std::vector<std::future<void>> tasks(nthreads);
   for (int i = 0; i < nthreads; i++)
     tasks[i] = std::move(std::async(std::launch::async, thread_f));
@@ -117,7 +141,7 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
     using namespace std::literals;
 
     report_progress(std::cout, shared_tile_id.load(), tile_count);
-    std::this_thread::sleep_for(250ms);
+    std::this_thread::sleep_for(sleep_duration);
   }
 
   report_progress(std::cout, tile_count, tile_count);
