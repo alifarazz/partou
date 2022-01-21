@@ -146,7 +146,7 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
 
   report_progress(std::cout, tile_count, tile_count);
 
-  for (int i = 0; i < nthreads; i++)  // shouldn't be needed, I put it here for good measure
-    tasks[i].wait();
+  // for (int i = 0; i < nthreads; i++)  // shouldn't be needed, I put it here for good measure
+  //   tasks[i].wait();
 }
 }  // namespace partou::tiling

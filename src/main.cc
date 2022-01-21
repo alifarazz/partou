@@ -197,24 +197,26 @@ int main(int argc, char* argv[])
   //////
   ////// Diagnostics
   fsec fs = timeEnd - timeStart;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Render time                                 : " << int_fast64_t(fs.count())
-            << " secs" << std::endl;
-  std::cout << "Total number of primary rays                : " << stats::numPrimaryRays.load()
-            << std::endl;
-  std::cout << "Total number of ray-bbox tests              : " << stats::numRayBBoxTests.load()
-            << std::endl;
-  // std::cout << "Total number of ray-boundvolume tests       : "
-  //           << stats::numRayBoundingVolumeTests.load() << qtd::endl;
-  std::cout << "Total number of ray-triangles tests         : "
-            << stats::numRayTrianglesTests.load() << std::endl;
-  std::cout << "Total number of ray-triangles intersections : "
-            << stats::numRayTrianglesIsect.load() << std::endl;
-  std::cout << "Ray-triangles tests/intersects              : "
+  std::cout << std::string(80, '-') << '\n'
+            << "Render time\t\t\t\t\t: " << int_fast64_t(fs.count()) << " secs" << '\n'
+            << "Total number of primary rays\t\t\t: " << stats::numPrimaryRays.load() << '\n'
+            << "Total number of ray-bbox tests\t\t\t: " << stats::numRayBBoxTests.load()
+            << '\n'
+            //  << "Total number of ray-boundvolume tests       : "
+            //           << stats::numRayBoundingVolumeTests.load() << '\n'
+            << "Total number of ray-triangles tests\t\t: " << stats::numRayTrianglesTests.load()
+            << '\n'
+            << "Total number of ray-triangles intersections\t: "
+            << stats::numRayTrianglesIsect.load() << '\n'
+            << "Ray-box tests/intersects\t\t\t: "
+            << percent<Float>(partou::stats::numRayTrianglesIsect.load(),
+                              partou::stats::numRayBBoxTests.load())
+            << "%" << '\n'
+            << "Ray-triangles tests/intersects\t\t\t: "
             << percent<Float>(partou::stats::numRayTrianglesIsect.load(),
                               partou::stats::numRayTrianglesTests.load())
-            << "%" << std::endl;
-  std::cout << "Total number of NaN pixels                  : " << stats::numNaNpixels << " ("
+            << "%" << '\n'
+            << "Total number of NaN pixels\t\t\t: " << stats::numNaNpixels << " ("
             << percent<Float>(stats::numNaNpixels.load(), filmbuffer.resolution()) << "%)"
             << std::endl;
 }
