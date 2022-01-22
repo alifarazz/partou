@@ -17,7 +17,7 @@ Sphere::Sphere(const math::Point3f& center, math::Float r, std::shared_ptr<Mater
 
 auto Sphere::computeBoundingBox() -> void
 {
-  const auto offset = decltype(this->center) {this->radius};
+  const auto offset = decltype(this->center) {std::abs(this->radius)};
   this->m_aabb = accel::AABB(this->center - offset, this->center + offset);
 }
 
