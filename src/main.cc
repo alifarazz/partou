@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
   auto light = ceiling;
   light = light.apply(spatial::Transform {Vec3f {0, 1.39, 0}, Vec3f {.3}, Vec3f {0}});
 
-  auto cube = Mesh {io::loader::OBJ("./cube.obj")};
+  auto cube = Mesh {io::loader::OBJ("./scenes/objs/cube.obj")};
   auto cube2 = cube;  // Mesh {io::loader::OBJ("./cube.obj")};
   cube = cube.apply(spatial::Transform(Vec3f {-.4, .25, -.6}, Vec3f {.25}, Vec3f {0, -PI / 18, 0}));
   cube2 = cube2.apply(
