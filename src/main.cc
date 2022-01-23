@@ -43,6 +43,8 @@ constexpr int spp_sqrt = 10;  // was 8
 constexpr int image_width = tiling::make_tile_friendly(w);
 constexpr int image_height = tiling::make_tile_friendly((image_width / aspect_ratio));
 
+auto hline = std::string(80, '-');
+
 int main(int argc, char* argv[])
 {
   using namespace partou;
@@ -182,6 +184,8 @@ int main(int argc, char* argv[])
   // const auto world = monkey_sphere;
   const auto world = cornells_box;
   auto lights = cornells_box_lights;
+  
+  std::cout << hline << '\n';
 
   // Render
   const auto timeStart = Time::now();
@@ -197,7 +201,7 @@ int main(int argc, char* argv[])
   //////
   ////// Diagnostics
   fsec fs = timeEnd - timeStart;
-  std::cout << std::string(80, '-') << '\n'
+  std::cout << hline << '\n' //
             << "Render time\t\t\t\t\t: " << int_fast64_t(fs.count()) << " secs" << '\n'
             << "Total number of primary rays\t\t\t: " << stats::numPrimaryRays.load() << '\n'
             << "Total number of ray-bbox tests\t\t\t: " << stats::numRayBBoxTests.load()

@@ -54,6 +54,8 @@ static auto serial_tile_snap(FilmBuffer<T>& fb,
                              const std::shared_ptr<const Hitable>& lights) -> void
 {
   using namespace partou::math;
+  
+  std::cout << "\rserial_tile_snap\ttile size: " << TILESIZE << 'x' << TILESIZE << '\n';
 
   auto report_progress = [](std::ostream& os, const auto i, const auto n)
   {
@@ -82,6 +84,8 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
                                int nthreads = -1) -> void
 {
   using namespace partou::math;
+  
+  std::cout << "\rparallel_tile_snap\ttile size: " << TILESIZE << 'x' << TILESIZE << '\n';
 
   constexpr int deltas_size = 1 << 3;  // can further be optimzed, no need to hold all the values
   constexpr std::chrono::milliseconds sleep_duration(350);
@@ -109,7 +113,7 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
       delay--;
       return;
     } else {
-      std::cout << ", time remaining: " << secs << " secs     " << std::flush;
+      std::cout << ", time remaining: " << secs << " secs\t" << std::flush;
     }
   };
 
@@ -132,6 +136,7 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
 
   int max_threads = std::thread::hardware_concurrency();
   nthreads = (nthreads < 1 || nthreads > max_threads) ? max_threads : nthreads;
+  std::cout << "\rparallel_tile_snap\trender thread count: " << nthreads << '\n';
 
   std::vector<std::future<void>> tasks(nthreads);
   for (int i = 0; i < nthreads; i++)
