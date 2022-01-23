@@ -18,7 +18,7 @@ int OBJ::load(const std::filesystem::path& path, bool load_normals)
     std::cerr << std::endl << "OBJ::load, " << path.string() << " not found.\n";
     return -2;
   }
-  std::cout << "OBJ::load-> begin\t" << path.filename() << '\n';
+//   std::cout << "OBJ::load-> begin\t" << path.filename() << '\n';
 
   std::ifstream file {path};
   std::string line;
@@ -38,7 +38,7 @@ int OBJ::load(const std::filesystem::path& path, bool load_normals)
     }
   }
 
-  std::cout << "OBJ::load-> end  \t" << path.filename() << '\n';
+  std::cout << "OBJ::load-> done  \t" << path.filename() << '\n';
   return 0;
 }
 

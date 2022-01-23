@@ -55,6 +55,9 @@ int main(int argc, char* argv[])
     std::cerr << "Bad args" << std::endl;
     exit(EXIT_FAILURE);
   }
+  const auto outputfilename = argv[1];
+  std::cout << "Output filename:\t\"" << outputfilename << "\"\n"
+            << hline << '\n';
 
   // Film
   FilmBuffer<Vec3f> filmbuffer {image_height, image_width, spp_sqrt};
@@ -194,7 +197,6 @@ int main(int argc, char* argv[])
   std::cerr << std::endl;
 
   const auto saver = io::PPMImageSaver {filmbuffer};
-  const auto outputfilename = argv[1];
   std::ofstream outputStream {outputfilename};
   saver.save(outputStream);
 

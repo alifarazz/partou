@@ -37,6 +37,7 @@ CPMAddPackage(
 if (Imath_ADDED)
   target_include_directories(Imath INTERFACE "$<BUILD_INTERFACE:${Imath_SOURCE_DIR}/src>")
 endif()
+
 CPMAddPackage(
   NAME pcg_cpp
   GITHUB_REPOSITORY imneme/pcg-cpp
@@ -54,11 +55,11 @@ find_package(Threads REQUIRED)
 
 file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${partou_SOURCE_DIR}/src/**/*.hh")
 file(GLOB CC_FILES_LIST CONFIGURE_DEPENDS "${partou_SOURCE_DIR}/src/**/*.cc")
-add_executable(partou src/main.cc ${CC_FILES_LIST} ${HEADER_LIST})
-target_compile_features(partou PUBLIC cxx_std_20)
-target_include_directories(partou PRIVATE "${pcg_cpp_include_directories}")
-target_link_libraries(partou PRIVATE Threads::Threads Imath)
+add_executable(${PROJECT_NAME} src/main.cc ${CC_FILES_LIST} ${HEADER_LIST})
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+target_include_directories(${PROJECT_NAME} PRIVATE "${pcg_cpp_include_directories}")
+target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads Imath)
 
 add_custom_target(create-scenes-symlink ALL COMMAND
-  ${CMAKE_COMMAND} -E create_symlink "${partou_SOURCE_DIR}/scenes" "$<TARGET_FILE_DIR:partou>/scenes"
+  ${CMAKE_COMMAND} -E create_symlink "${partou_SOURCE_DIR}/scenes" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/scenes"
 )

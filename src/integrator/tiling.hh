@@ -85,8 +85,6 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
 {
   using namespace partou::math;
   
-  std::cout << "\rparallel_tile_snap\ttile size: " << TILESIZE << 'x' << TILESIZE << '\n';
-
   std::cout << "\rparallel_tile_snap\tsqrt spp: " << fb.sample_per_pixel_sqrt << '\n';
   std::cout << "\rparallel_tile_snap\ttile size: " << TILESIZE << 'x' << TILESIZE << '\n';
 
