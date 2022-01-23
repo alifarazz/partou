@@ -17,7 +17,6 @@
 
 namespace partou::integrator::uniPathTracer
 {
-constexpr int_fast32_t TILESIZE = 16;
 constexpr int TRACER_MAX_DEPTH = 50;
 constexpr Spectrum background_color = sRGBSpectrum(0);
 
