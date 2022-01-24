@@ -1,23 +1,9 @@
 # Partou
 A Uni-directional Ray-Tracer with Path Tracing and Monte-Carlo method.
 
-
-- Build project
-    ``` sh
-    $ mkdir build
-    $ cmake -DCMAKE_BUILD_TYPE=Release -B build -S .
-    $ cmake --build build -t all
-    ```
-- Run project
-    ``` sh
-    $ cd build
-    $ ./partou output.ppm
-    $ open output.ppm  # or use a ppm viewer
-    ```
+![Cornell's box with causatics](.gallery/Cornell_with_causatics.png "Cornell's box with causatics")
 
 ## Renders
-
-![Cornell's box with causatics](.gallery/Cornell_with_causatics.png "Cornell's box with causatics")
 
 <details>
 <summary>
@@ -25,6 +11,7 @@ A Uni-directional Ray-Tracer with Path Tracing and Monte-Carlo method.
 </summary>
  
 ![Cornell's box using MCMC and mixture pdf](.gallery/Cornells_box_using_MCMC_and_mixture_pdf.png "Cornell's box using MCMC and mixture pdf")
+![Cornell's box with causatics](.gallery/Cornell_with_causatics.png "Cornell's box with causatics")
 </details>
 
 <details>
@@ -49,3 +36,22 @@ A Uni-directional Ray-Tracer with Path Tracing and Monte-Carlo method.
 ![Sphere and Triangle Rendering](.gallery/sphere_triange_rendering.png)
 </details>
 
+## Running Partou
+- Clone project
+    ``` sh
+    $ git clone https://codeberg.org/alifara/partou.git
+    $ git lfs pull
+    ```
+- Build project
+    ``` sh
+    $ cd partou
+    $ mkdir build
+    $ cmake -DCMAKE_BUILD_TYPE=Release -B build -S .
+    $ cmake --build build -t all
+    ```
+- Run project
+    ``` sh
+    $ cd build
+    $ ./partou output.ppm
+    $ open output.ppm  # or use a ppm viewer
+    ```
