@@ -108,13 +108,13 @@ static inline auto samplePixelJittered(const PinholeCamera& cam,
 
   auto color = Vec3f {0};
   const auto substep = inv(Float(spp_sqrt));  // god I hope c++ gets UFCS one day
-  const auto scaleInv = inv(Vec2f(resolution.x - 1, resolution.y - 1));
+  const auto scaleInv = inv(Vec2f(resolution[1] - 1, resolution[0] - 1));
 
-  for (int s_x = 0; s_x < spp_sqrt; s_x++) {
     for (int s_y = 0; s_y < spp_sqrt; s_y++) {
+  for (int s_x = 0; s_x < spp_sqrt; s_x++) {
       const auto pixel_space_pos =
-          Vec2f {pixel_coord[1] + s_x * substep + random::get(Float(0), substep),
-                 pixel_coord[0] + s_y * substep + random::get(Float(0), substep)};
+          Vec2f {pixel_coord[1] + s_y * substep + random::get(Float(0), substep),
+                 pixel_coord[0] + s_x * substep + random::get(Float(0), substep)};
 
       const auto uv = pixel_space_pos * scaleInv;  // refactor into film.make_uv()
 

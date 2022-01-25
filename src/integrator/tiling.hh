@@ -54,7 +54,7 @@ static auto serial_tile_snap(FilmBuffer<T>& fb,
                              const std::shared_ptr<const Hitable>& lights) -> void
 {
   using namespace partou::math;
-  
+
   std::cout << "\rserial_tile_snap\ttile size: " << TILESIZE << 'x' << TILESIZE << '\n';
 
   auto report_progress = [](std::ostream& os, const auto i, const auto n)
@@ -84,7 +84,7 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
                                int nthreads = -1) -> void
 {
   using namespace partou::math;
-  
+
   std::cout << "\rparallel_tile_snap\tsqrt spp: " << fb.sample_per_pixel_sqrt << '\n';
   std::cout << "\rparallel_tile_snap\ttile size: " << TILESIZE << 'x' << TILESIZE << '\n';
 
@@ -118,7 +118,7 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
     }
   };
 
-  const auto resolution = math::Vec2i {int(fb.nx()), int(fb.ny())};
+  const auto resolution = math::Vec2i {int(fb.ny()), int(fb.nx())};
   const auto tile_size = resolution / TILESIZE;
   const auto tile_count = tile_size.x * tile_size.y;
 
@@ -130,8 +130,8 @@ static auto parallel_tile_snap(FilmBuffer<T>& fb,
       if (tile >= tile_count)
         return;
 
-      auto&& offset = Vec2i {tile % tile_size.x, tile / tile_size.y} * TILESIZE;
-      snap_tile(fb, cam, world, lights, resolution, std::move(offset));
+      auto offset = Vec2i {tile / tile_size[1], tile % tile_size[1]} * TILESIZE;
+      snap_tile(fb, cam, world, lights, resolution, offset);
     }
   };
 

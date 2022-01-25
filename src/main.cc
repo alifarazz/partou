@@ -56,8 +56,6 @@ int main(int argc, char* argv[])
     exit(EXIT_FAILURE);
   }
   const auto outputfilename = argv[1];
-  std::cout << "Output filename:\t\"" << outputfilename << "\"\n"
-            << hline << '\n';
 
   // Film
   FilmBuffer<Vec3f> filmbuffer {image_height, image_width, spp_sqrt};
@@ -76,7 +74,8 @@ int main(int argc, char* argv[])
   const auto vUp = Vec3f(0, 1, 0);
   const auto fov = Degree(36);  // 36
 
-  const PinholeCamera cam(lookFrom, lookAt, vUp, fov, aspect_ratio);
+  const auto aspr = Float(image_width) / Float(image_height);
+  const PinholeCamera cam(lookFrom, lookAt, vUp, fov, aspr);
 
   // Transform
   // const auto lookLeft =
@@ -187,7 +186,7 @@ int main(int argc, char* argv[])
   // const auto world = monkey_sphere;
   const auto world = cornells_box;
   auto lights = cornells_box_lights;
-  
+
   std::cout << hline << '\n';
 
   // Render
@@ -203,7 +202,7 @@ int main(int argc, char* argv[])
   //////
   ////// Diagnostics
   fsec fs = timeEnd - timeStart;
-  std::cout << hline << '\n' //
+  std::cout << hline << '\n'  //
             << "Render time\t\t\t\t\t: " << int_fast64_t(fs.count()) << " secs" << '\n'
             << "Total number of primary rays\t\t\t: " << stats::numPrimaryRays.load() << '\n'
             << "Total number of ray-bbox tests\t\t\t: " << stats::numRayBBoxTests.load()
