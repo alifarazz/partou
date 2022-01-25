@@ -16,6 +16,14 @@ A Uni-directional Ray-Tracer with Path Tracing and Monte-Carlo method.
 
 <details>
 <summary>
+ <b>Shirley's Spheres</b>
+</summary>
+ 
+![Shirley's Spheres](.gallery/shirleys_spheres.png "Shirley's Spheres")
+</details>
+
+<details>
+<summary>
  <b>Different Materials</b>
 </summary>
  
