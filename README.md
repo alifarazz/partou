@@ -11,7 +11,7 @@ A Uni-directional Ray-Tracer with Path Tracing and Monte-Carlo method.
 </summary>
  
 ![Cornell's box using MCMC and mixture pdf](.gallery/Cornells_box_using_MCMC_and_mixture_pdf.png "Cornell's box using MCMC and mixture pdf")
-![Cornell's box with causatics](.gallery/Cornell_with_causatics.png "Cornell's box with causatics")
+<!-- ![Cornell's box with causatics](.gallery/Cornell_with_causatics.png "Cornell's box with causatics") -->
 </details>
 
 <details>
