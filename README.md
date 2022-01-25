@@ -39,6 +39,7 @@ A Uni-directional Ray-Tracer with Path Tracing and Monte-Carlo method.
  
 ![Suzzane next to a glass sphere](.gallery/suz_with_sphere.png "Suzzane next to a glass sphere")
 ![Flat Stanford Bunny](.gallery/bun.png "Flat Stanford Bunny")
+![Flat Stanford Dragon](.gallery/dragon.png "Flat Stanford Dragon")
 ![Flat Suzzane](.gallery/suzanne.png "Flat Suzzane")
 ![Smooth Suzzane](.gallery/suzzane_trans_smooth_msaa.png "Smooth Suzzane")
 ![Sphere and Triangle Rendering](.gallery/sphere_triange_rendering.png)
