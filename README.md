@@ -7,19 +7,22 @@ A Uni-directional Ray-Tracer with Path Tracing and Monte-Carlo method.
 
 <details>
 <summary>
- <b>Standard Cornell's box</b>
+ <b>Cornell Box</b>
 </summary>
  
-![Cornell's box using MCMC and mixture pdf](.gallery/Cornells_box_using_MCMC_and_mixture_pdf.png "Cornell's box using MCMC and mixture pdf")
-<!-- ![Cornell's box with causatics](.gallery/Cornell_with_causatics.png "Cornell's box with causatics") -->
+| ![Cornell box using MCMC and mixture pdf](.gallery/Cornells_box_using_MCMC_and_mixture_pdf.png "Cornell box using MCMC and mixture pdf") | ![Cornell box using MCMC and mixture pdf](.gallery/Cornells_box_with_caustics.png "Cornell's box with caustics pdf") | ![Cornell box and a golden Suzzane](.gallery/Cornells_box_and_a_golden_Suzzane.png "Cornell box and a golden Suzzane") |
+|-|-|-|
+| Standard | With Caustics | With Golden Suzanne |
+ 
+ <!-- ![Cornell's box with causatics](.gallery/Cornell_with_causatics.png "Cornell's box with causatics") -->
 </details>
 
 <details>
 <summary>
- <b>Shirley's Spheres</b>
+ <b>Shirley Spheres</b>
 </summary>
  
-![Shirley's Spheres](.gallery/shirleys_spheres.png "Shirley's Spheres")
+![Shirley Spheres](.gallery/shirleys_spheres.png "Shirley Spheres")
 </details>
 
 <details>
@@ -27,9 +30,10 @@ A Uni-directional Ray-Tracer with Path Tracing and Monte-Carlo method.
  <b>Different Materials</b>
 </summary>
  
-![Suzzane with Glass material](.gallery/glass_with_total_internal_suz.png "Suzzane with Glass material")
-![Suzzane with Lambertian material](.gallery/lamb_suz.png "Suzzane with Lambertian material")
-![Suzzane with Metal material](.gallery/metal_smooth_fuz_suz.png "Suzzane with Metal material")
+| ![Suzzane with Glass material](.gallery/glass_with_total_internal_suz.png "Suzzane with Glass material") | ![Suzzane with Lambertian material](.gallery/lamb_suz.png "Suzzane with Lambertian material") | ![Suzzane with Metal material](.gallery/metal_smooth_fuz_suz.png "Suzzane with Metal material") |
+|-|-|-|
+| Dielectric (Glass) | Lambertian | Metal (Aluminum) |
+
 </details>
 
 <details>
